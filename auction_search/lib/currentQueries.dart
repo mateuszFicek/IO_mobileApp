@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -8,6 +6,12 @@ class CurrentQueries extends StatefulWidget {
   final String title;
   @override
   _CurrentQueriesState createState() => new _CurrentQueriesState();
+}
+
+class FakeQueryData {
+  static String name = "Samsung Galaxy S10";
+  static int price = 1000;
+  static String auctionService = "Allegro.pl";
 }
 
 class _CurrentQueriesState extends State<CurrentQueries> {
@@ -35,7 +39,13 @@ class _CurrentQueriesState extends State<CurrentQueries> {
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: new Scaffold(
-        body: new Container(),
+        body: new Center(
+          child: Column(
+            children: <Widget>[
+              Text('Your current queries!'),
+            ],
+          ),
+        ),
       ),
     );
   }
