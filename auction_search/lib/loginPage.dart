@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:auction_search/currentQueries.dart';
 import 'package:auction_search/registerPage.dart';
 import 'package:flutter/material.dart';
