@@ -1,3 +1,4 @@
+import 'package:auction_search/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,35 +6,39 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'request.dart';
 
-class CurrentQueries extends StatefulWidget {
-  CurrentQueries({Key key, this.title}) : super(key: key);
+class CurrentRequests extends StatefulWidget {
+  CurrentRequests({Key key, this.title}) : super(key: key);
   final String title;
   @override
-  _CurrentQueriesState createState() => new _CurrentQueriesState();
+  _CurrentRequestsState createState() => new _CurrentRequestsState();
 }
 
-class FakeQueryData {
-  static String name = "Samsung Galaxy S10";
-  static int price = 1000;
-  static String auctionService = "Allegro.pl";
-}
-
-class _CurrentQueriesState extends State<CurrentQueries> {
+class _CurrentRequestsState extends State<CurrentRequests> {
   List<Request> _requests;
   bool dataIsLoaded = false;
+  int user;
+  SharedPreferences prefs;
 
   @override
   void initState() {
     super.initState();
     fetchPost();
+    _loadUser();
   }
+
+  _loadUser() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      user = (prefs.getInt('userid'));
+    });
+  }
+
 //DODAC LINK DO POBIERANIA DANYCH Z NASZEGO SERWERA
   Future<Request> fetchPost() async {
     List<Request> requests = [];
     //ZMIENIC TU LINK
     final response =
         await http.get('http://www.mocky.io/v2/5de24d79320000afe88095b6');
-
     if (response.statusCode == 200) {
       List<dynamic> values = new List<dynamic>();
       values = json.decode(response.body);
@@ -82,8 +87,20 @@ class _CurrentQueriesState extends State<CurrentQueries> {
             ? Center(child: CircularProgressIndicator())
             : new Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text('Your current queries!'),
+                    Text('Here is your home page! You are user: $user'),
+                    FlatButton(
+                      onPressed: () {
+                        prefs.clear();
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    MyHomePage()),
+                            (Route<dynamic> route) => false);
+                      },
+                      child: Text("Logout"),
+                    ),
                   ],
                 ),
               ),

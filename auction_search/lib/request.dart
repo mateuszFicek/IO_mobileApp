@@ -8,7 +8,15 @@ class Request {
   final String auctionLinkAllegro;
   final String auctionLinkEbay;
 
-  Request({this.userid, this.requestId, this.title, this.creationDate,this.status, this.price, this.auctionLinkAllegro, this.auctionLinkEbay});
+  Request(
+      {this.userid,
+      this.requestId,
+      this.title,
+      this.creationDate,
+      this.status,
+      this.price,
+      this.auctionLinkAllegro,
+      this.auctionLinkEbay});
 
   factory Request.fromJson(Map<String, dynamic> json) {
     return Request(

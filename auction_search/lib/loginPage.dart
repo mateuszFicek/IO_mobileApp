@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:auction_search/currentQueries.dart';
+import 'package:auction_search/User.dart';
+import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/registerPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,22 +27,30 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   signIn(String username, password) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    Map data = {'username': username, 'password': password};
-
+    SharedPreferences user = await SharedPreferences.getInstance();
+    String basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    print(basicAuth);
     var jsonResponse;
-    //ZMIENIC URL NA NASZ SERWER
-    var response = await http.post("URL", body: data);
+    var response = await http.get(
+        "https://fast-everglades-04594.herokuapp.com/login",
+        headers: <String, String>{'authorization': basicAuth});
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
+      print(response.body);
       if (jsonResponse != null) {
         setState(() {
           _isLoading = false;
         });
-        sharedPreferences.setString("token", jsonResponse['token']);
+        user.setInt("userid", jsonResponse['id']);
+        print("'''''''''''''''''''''''''''");
+        print(user.getInt('userid'));
+        print("'''''''''''''''''''''''''''");
+        User currentUser = User.fromJson(jsonResponse);
+        print(jsonResponse.toString());
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-                builder: (BuildContext context) => CurrentQueries()),
+                builder: (BuildContext context) => CurrentRequests()),
             (Route<dynamic> route) => false);
       }
     } else {
@@ -144,25 +153,14 @@ class _LoginPageState extends State<LoginPage> {
                   FlatButton(
                     child: Text('Check?'),
                     onPressed: () {
-                      if (FakeUser.password == _password &&
-                          FakeUser.userName == _login) {
-                        print("Poprawne");
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CurrentQueries()));
+                      if (_textLogin.text == "" || _textPassword.text == "") {
+                        return null;
                       } else {
-                        print('Niepoprawne');
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        signIn(_textLogin.text, _textPassword.text);
                       }
-                      // ZROBIONE JAK JUZ BEDZIE MOZNA SIE LOGOWAC Z SERWERA
-                      // if (_textLogin.text == "" || _textPassword.text == "") {
-                      //   return null;
-                      // } else {
-                      //   setState(() {
-                      //     _isLoading = true;
-                      //   });
-                      //   signIn(_textLogin.text, _textPassword.text);
-                      // }
                     },
                   ),
                 ],
