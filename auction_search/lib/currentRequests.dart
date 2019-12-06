@@ -1,3 +1,4 @@
+import 'package:auction_search/addNewRequestPage.dart';
 import 'package:auction_search/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,14 +23,16 @@ class _CurrentRequestsState extends State<CurrentRequests> {
   @override
   void initState() {
     super.initState();
-    fetchPost();
+    //fetchPost();
     _loadUser();
   }
 
   _loadUser() async {
+    print("Loading user data");
     prefs = await SharedPreferences.getInstance();
     setState(() {
       user = (prefs.getInt('userid'));
+      dataIsLoaded = true;
     });
   }
 
@@ -83,6 +86,16 @@ class _CurrentRequestsState extends State<CurrentRequests> {
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: new Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          backgroundColor: Colors.black,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddNewRequestPage()),
+            );
+          },
+        ),
         body: !dataIsLoaded
             ? Center(child: CircularProgressIndicator())
             : new Center(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:auction_search/User.dart';
 import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/registerPage.dart';
@@ -6,17 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+// TODO:
+// - pusuwac wszystkie zbedne printy
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
   static const String routeName = "/registerPage";
   final String title;
   @override
   _LoginPageState createState() => new _LoginPageState();
-}
-
-class FakeUser {
-  static String userName = "abc";
-  static String password = "abc";
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -30,24 +28,18 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences user = await SharedPreferences.getInstance();
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    print(basicAuth);
     var jsonResponse;
     var response = await http.get(
         "https://fast-everglades-04594.herokuapp.com/login",
-        headers: <String, String>{'authorization': basicAuth});
+        headers: {HttpHeaders.authorizationHeader: basicAuth});
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
-      print(response.body);
       if (jsonResponse != null) {
         setState(() {
-          _isLoading = false;
+          _isLoading = true;
         });
         user.setInt("userid", jsonResponse['id']);
-        print("'''''''''''''''''''''''''''");
-        print(user.getInt('userid'));
-        print("'''''''''''''''''''''''''''");
         User currentUser = User.fromJson(jsonResponse);
-        print(jsonResponse.toString());
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (BuildContext context) => CurrentRequests()),
@@ -57,7 +49,6 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = false;
       });
-      print(response.body);
     }
   }
 
