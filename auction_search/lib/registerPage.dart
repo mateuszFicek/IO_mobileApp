@@ -33,8 +33,8 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _textLogin = TextEditingController();
   TextEditingController _textPassword = TextEditingController();
 
-  Future registerNewUser(
-      String username, password, passwordAgain, email) async {
+  Future registerNewUser(String username, String password, String passwordAgain,
+      String email) async {
     print("Tutaj!");
     SharedPreferences user = await SharedPreferences.getInstance();
     if (password != passwordAgain) {
@@ -42,15 +42,15 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     var params = {"username": username, "password": password, "email": email};
-    Uri uri = Uri.parse("https://fast-everglades-04594.herokuapp.com/register");
-    final newUri = uri.replace(queryParameters: params);
-
-    String basicAuth =
-        'Basic ' + base64Encode(utf8.encode('$username:$password'));
     var jsonResponse;
-    var response = await http
-        .get(newUri, headers: {HttpHeaders.authorizationHeader: basicAuth});
-    print(response.statusCode);
+    print(json.encode(params));
+    var response = await http.post(
+        "https://fast-everglades-04594.herokuapp.com/register",
+        body: json.encode(params),
+        headers: {
+          "Accept": "application/json",
+          "content-type": "application/json"
+        });
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
       setState(() {
@@ -174,62 +174,64 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: buildLoginTextField()),
-            Padding(
-              padding: EdgeInsets.all(10),
-            ),
-            Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: buildEmailTextField()),
-            Padding(
-              padding: EdgeInsets.all(10),
-            ),
-            Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: buildPasswordTextField()),
-            Padding(
-              padding: EdgeInsets.all(10),
-            ),
-            Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: buildPasswordAgainTextField()),
-            Padding(
-              padding: EdgeInsets.all(10),
-            ),
-            Text('You are on a register page!'),
-            FlatButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Go back to prevoius page!'),
-            ),
-            FlatButton(
-              child: Text(
-                'Click here to sign in.',
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: buildLoginTextField()),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: buildEmailTextField()),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: buildPasswordTextField()),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: buildPasswordAgainTextField()),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
+                  Text('You are on a register page!'),
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Go back to prevoius page!'),
+                  ),
+                  FlatButton(
+                    child: Text(
+                      'Click here to sign in.',
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
+                  ),
+                  FlatButton(
+                    child: Text('Sign up'),
+                    onPressed: () {
+                      registerNewUser(_textLogin.text, _textPassword.text,
+                          _textPasswordAgain.text, _textEmail.text);
+                    },
+                  ),
+                ],
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              },
             ),
-            FlatButton(
-              child: Text('Sign up'),
-              onPressed: () {
-                registerNewUser(_textLogin.text, _textPassword.text,
-                    _textPasswordAgain.text, _textEmail.text);
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
