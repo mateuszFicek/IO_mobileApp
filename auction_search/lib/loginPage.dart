@@ -38,7 +38,11 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _isLoading = true;
         });
+        print(jsonResponse['user_id']);
         user.setInt("userid", jsonResponse['id']);
+        user.setString("username", jsonResponse['username']);
+        user.setString("password", password);
+
         User currentUser = User.fromJson(jsonResponse);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(

@@ -1,9 +1,16 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:auction_search/User.dart';
+import 'package:auction_search/request.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 //TODO:
 // - zmienić wygląd i napisy, ktore pojawiaja sie
 // - dodac ze nie mozna zostawic pustego pola
-// - dodac wysylanie requestow na serwer
 class AddNewRequestPage extends StatefulWidget {
   AddNewRequestPage({Key key, this.title}) : super(key: key);
   final String title;
@@ -13,9 +20,66 @@ class AddNewRequestPage extends StatefulWidget {
 
 class _AddNewRequestPageState extends State<AddNewRequestPage> {
   String _description;
-  TextEditingController _textDescription = new TextEditingController();
   double _price;
+  TextEditingController _textDescription = new TextEditingController();
   TextEditingController _textPrice = new TextEditingController();
+  bool _isLoading = false;
+
+  Future addNewRequest(String description, double price) async {
+    SharedPreferences user = await SharedPreferences.getInstance();
+    String username = user.getString('username');
+    String password = user.getString('password');
+    print(password);
+    print(username);
+    String basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    var params = {"min_price": price, "descripition": description};
+    var jsonResponse;
+    var response = await http.post(
+        "https://fast-everglades-04594.herokuapp.com/request/add",
+        body: json.encode(params),
+        headers: {
+          HttpHeaders.authorizationHeader: basicAuth,
+          "Accept": "application/json",
+          "content-type": "application/json"
+        });
+    print(
+        "-------------------------------Response Code-------------------------------");
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      jsonResponse = json.decode(response.body);
+      setState(() {
+        _isLoading = false;
+      });
+      print("Udało się!");
+      Request currentRequest = Request.fromJson(jsonResponse);
+      // Navigator.of(context).pushAndRemoveUntil(
+      //     MaterialPageRoute(
+      //         builder: (BuildContext context) => DetailedRequest()),
+      //     (Route<dynamic> route) => false);
+      onRequestAdded();
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<bool> onRequestAdded() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Request was added"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Go back to all requests'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
   TextFormField buildDescriptionTextField() {
     return TextFormField(
       style: TextStyle(color: Colors.white),
@@ -79,6 +143,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
                 //Dodać funkcję do wysyłania requestów do serwera
                 print(_price.toString());
                 print(_description);
+                addNewRequest(_description, _price);
               },
             ),
             Text("Add new request page."),
