@@ -24,4 +24,8 @@ class User {
         email: json['email'],
         date: json['date']);
   }
+
+  String get userName => username;
+
+  int get id => userid;
 }

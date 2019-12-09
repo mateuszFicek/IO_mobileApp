@@ -20,16 +20,16 @@ class CurrentRequests extends StatefulWidget {
 class _CurrentRequestsState extends State<CurrentRequests> {
   List<Request> _requests;
   bool dataIsLoaded = false;
-  String userName;
+  String username;
   SharedPreferences user;
+  int userid;
+  String password;
 
   @override
   void initState() {
     super.initState();
     loadUser();
-    print("INIt");
-    print(dataIsLoaded);
-    //fetchRequests();
+    fetchRequests();
   }
 
   Future clearUser() async {
@@ -40,33 +40,32 @@ class _CurrentRequestsState extends State<CurrentRequests> {
   Future loadUser() async {
     final SharedPreferences user = await SharedPreferences.getInstance();
     if (user.getString('username') != null) {
-      print(user.getString('username'));
       setState(() {
-        userName = user.getString("username");
+        userid = user.getInt('userid');
+        username = user.getString("username");
+        password = user.getString('password');
 
         dataIsLoaded = true;
       });
     }
   }
 
-//DODAC LINK DO POBIERANIA DANYCH Z NASZEGO SERWERA
   Future fetchRequests() async {
     List<Request> requests = [];
     final SharedPreferences user = await SharedPreferences.getInstance();
 
-    userName = user.getString('username');
-    int userid = user.getInt('userid');
-    String username = user.getString('username');
+    username = user.getString('username');
+    print("USERID $userid");
     String password = user.getString('password');
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     final response = await http.get(
-        "https://fast-everglades-04594.herokuapp.com/request/user/$userName",
+        "https://fast-everglades-04594.herokuapp.com/request/user/$userid",
         headers: {HttpHeaders.authorizationHeader: basicAuth});
-    print("RESPONSE");
-    print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> values = new List<dynamic>();
+      print("Body = ");
+      print(response.body);
       values = json.decode(response.body);
       if (values.length > 0) {
         for (var a in values)
@@ -74,7 +73,6 @@ class _CurrentRequestsState extends State<CurrentRequests> {
             Request post = Request.fromJson(a);
             requests.add(post);
           }
-        print(requests.length.toString());
       }
     } else {
       throw Exception('Failed to load post');
@@ -110,7 +108,10 @@ class _CurrentRequestsState extends State<CurrentRequests> {
       onWillPop: _onBackPressed,
       child: new Scaffold(
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: Icon(
+            Icons.add,
+            color: Colors.grey,
+          ),
           backgroundColor: Colors.black,
           onPressed: () {
             Navigator.push(
@@ -125,12 +126,26 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text("Hello"),
-                    Text("User that logged $userName"),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: <Widget>[
+                          Text(
+                            "Hello",
+                            style: TextStyle(fontSize: 32),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(3),
+                          ),
+                          Text(
+                            "$username",
+                            style: TextStyle(fontSize: 48),
+                          ),
+                        ]),
                     FlatButton(
                       onPressed: () {
-                        print("xxxx $userName");
-                        if (userName == null) clearUser();
+                        if (username == null) clearUser();
                         Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (BuildContext context) =>

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:auction_search/User.dart';
+import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,13 +28,16 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
 
   Future addNewRequest(String description, double price) async {
     SharedPreferences user = await SharedPreferences.getInstance();
-    String username = "admin"; // user.getString('username');
-    String password = "admin"; //user.getString('password');
-    print(password);
-    print(username);
+    String username = user.getString('username');
+    String password = user.getString('password');
+    int userid = user.getInt('userid');
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    var params = {"min_price": price, "descripition": description};
+    var params = {
+      "userid": userid,
+      "max_price": price,
+      "descripition": description
+    };
     var jsonResponse;
     var response = await http.post(
         "https://fast-everglades-04594.herokuapp.com/request/add",
@@ -43,20 +47,15 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
           "Accept": "application/json",
           "content-type": "application/json"
         });
-    print(
-        "-------------------------------Response Code-------------------------------");
-    print(response.statusCode);
     if (response.statusCode == 200) {
+      print("Body requesta = ");
+      print(response.body);
       jsonResponse = json.decode(response.body);
       setState(() {
         _isLoading = false;
       });
       print("Udało się!");
       Request currentRequest = Request.fromJson(jsonResponse);
-      // Navigator.of(context).pushAndRemoveUntil(
-      //     MaterialPageRoute(
-      //         builder: (BuildContext context) => DetailedRequest()),
-      //     (Route<dynamic> route) => false);
       onRequestAdded();
     } else {
       setState(() {
@@ -73,7 +72,12 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
         actions: <Widget>[
           FlatButton(
             child: Text('Go back to all requests'),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => CurrentRequests()),
+                  (Route<dynamic> route) => false);
+            },
           ),
         ],
       ),
@@ -87,7 +91,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
       autocorrect: false,
       decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Description',
+          hintText: 'Tytuł aukcji',
           fillColor: Colors.black,
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
@@ -111,7 +115,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
       autocorrect: false,
       decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Price',
+          hintText: 'Cena',
           fillColor: Colors.black,
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
@@ -131,14 +135,24 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      appBar: AppBar(),
       body: new Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            buildDescriptionTextField(),
-            buildPriceTextField(),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: buildDescriptionTextField(),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: buildPriceTextField(),
+            ),
             FlatButton(
-              child: Text("Submit request"),
+              child: Text("Dodaj zapytanie"),
               onPressed: () {
                 //Dodać funkcję do wysyłania requestów do serwera
                 print(_price.toString());
@@ -146,7 +160,6 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
                 addNewRequest(_description, _price);
               },
             ),
-            Text("Add new request page."),
           ],
         ),
       ),

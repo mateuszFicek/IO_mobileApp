@@ -56,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
 
   TextFormField buildLoginTextField() {
     return TextFormField(
+      key: Key("LoginTextField"),
       style: TextStyle(color: Colors.white),
       controller: _textLogin,
       autocorrect: false,
@@ -80,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
 
   TextFormField buildPasswordTextField() {
     return TextFormField(
+      key: Key("PasswordTextField"),
       style: TextStyle(color: Colors.white),
       controller: _textPassword,
       obscureText: true,
