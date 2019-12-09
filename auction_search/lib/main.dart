@@ -44,11 +44,11 @@ class MyHomePage extends StatefulWidget {
 
 Future<bool> showLoginPage() async {
   var userLogged = await SharedPreferences.getInstance();
-  int user = userLogged.getInt('userid');
-  if (user != null) {
-    return true;
+  String user = userLogged.getString('username');
+  if (user == null) {
+    return false;
   }
-  return false;
+  return true;
 }
 
 class _MyHomePageState extends State<MyHomePage> {

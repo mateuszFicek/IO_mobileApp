@@ -35,10 +35,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future registerNewUser(String username, String password, String passwordAgain,
       String email) async {
-    print("Tutaj!");
     SharedPreferences user = await SharedPreferences.getInstance();
     if (password != passwordAgain) {
-      print("Wrong passwords");
       return;
     }
     var params = {"username": username, "password": password, "email": email};
@@ -57,7 +55,6 @@ class _RegisterPageState extends State<RegisterPage> {
         _isLoading = false;
       });
       user.setInt("userid", jsonResponse['id']);
-      print("Udało się!");
       User currentUser = User.fromJson(jsonResponse);
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
@@ -68,13 +65,6 @@ class _RegisterPageState extends State<RegisterPage> {
         _isLoading = false;
       });
     }
-  }
-
-  bool checkIfPasswordsAreCorrect() {
-    if (_password == _passwordAgain) {
-      return true;
-    } else
-      return false;
   }
 
   TextFormField buildLoginTextField() {
@@ -130,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: true,
       decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Password',
+          hintText: 'Hasło',
           fillColor: Colors.black,
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
@@ -154,7 +144,7 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: true,
       decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Confirm Password',
+          hintText: 'Potwierdź hasło',
           fillColor: Colors.black,
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
@@ -204,16 +194,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   Padding(
                     padding: EdgeInsets.all(10),
                   ),
-                  Text('You are on a register page!'),
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('Go back to prevoius page!'),
-                  ),
                   FlatButton(
                     child: Text(
-                      'Click here to sign in.',
+                      'Kliknij tu, aby się zalogować',
                     ),
                     onPressed: () {
                       Navigator.push(
@@ -223,7 +206,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   FlatButton(
-                    child: Text('Sign up'),
+                    child: Text('Zarejestruj się'),
                     onPressed: () {
                       registerNewUser(_textLogin.text, _textPassword.text,
                           _textPasswordAgain.text, _textEmail.text);

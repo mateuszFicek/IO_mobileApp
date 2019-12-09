@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:auction_search/addNewRequestPage.dart';
 import 'package:auction_search/main.dart';
 import 'package:flutter/material.dart';
@@ -17,31 +20,51 @@ class CurrentRequests extends StatefulWidget {
 class _CurrentRequestsState extends State<CurrentRequests> {
   List<Request> _requests;
   bool dataIsLoaded = false;
-  int user;
-  SharedPreferences prefs;
+  String userName;
+  SharedPreferences user;
 
   @override
   void initState() {
     super.initState();
-    //fetchPost();
-    _loadUser();
+    loadUser();
+    print("INIt");
+    print(dataIsLoaded);
+    //fetchRequests();
   }
 
-  _loadUser() async {
-    print("Loading user data");
-    prefs = await SharedPreferences.getInstance();
-    setState(() {
-      user = (prefs.getInt('userid'));
-      dataIsLoaded = true;
-    });
+  Future clearUser() async {
+    final SharedPreferences user = await SharedPreferences.getInstance();
+    user.clear();
+  }
+
+  Future loadUser() async {
+    final SharedPreferences user = await SharedPreferences.getInstance();
+    if (user.getString('username') != null) {
+      print(user.getString('username'));
+      setState(() {
+        userName = user.getString("username");
+
+        dataIsLoaded = true;
+      });
+    }
   }
 
 //DODAC LINK DO POBIERANIA DANYCH Z NASZEGO SERWERA
-  Future<Request> fetchPost() async {
+  Future fetchRequests() async {
     List<Request> requests = [];
-    //ZMIENIC TU LINK
-    final response =
-        await http.get('http://www.mocky.io/v2/5de24d79320000afe88095b6');
+    final SharedPreferences user = await SharedPreferences.getInstance();
+
+    userName = user.getString('username');
+    int userid = user.getInt('userid');
+    String username = user.getString('username');
+    String password = user.getString('password');
+    String basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    final response = await http.get(
+        "https://fast-everglades-04594.herokuapp.com/request/user/$userName",
+        headers: {HttpHeaders.authorizationHeader: basicAuth});
+    print("RESPONSE");
+    print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> values = new List<dynamic>();
       values = json.decode(response.body);
@@ -102,10 +125,12 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text('Here is your home page! You are user: $user'),
+                    Text("Hello"),
+                    Text("User that logged $userName"),
                     FlatButton(
                       onPressed: () {
-                        prefs.clear();
+                        print("xxxx $userName");
+                        if (userName == null) clearUser();
                         Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (BuildContext context) =>

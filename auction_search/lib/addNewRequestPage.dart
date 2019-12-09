@@ -27,8 +27,8 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
 
   Future addNewRequest(String description, double price) async {
     SharedPreferences user = await SharedPreferences.getInstance();
-    String username = user.getString('username');
-    String password = user.getString('password');
+    String username = "admin"; // user.getString('username');
+    String password = "admin"; //user.getString('password');
     print(password);
     print(username);
     String basicAuth =

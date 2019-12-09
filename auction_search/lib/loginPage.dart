@@ -38,11 +38,9 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _isLoading = true;
         });
-        print(jsonResponse['user_id']);
         user.setInt("userid", jsonResponse['id']);
         user.setString("username", jsonResponse['username']);
         user.setString("password", password);
-
         User currentUser = User.fromJson(jsonResponse);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
@@ -87,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
       obscureText: true,
       decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Password',
+          hintText: 'Hasło',
           fillColor: Colors.black,
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
@@ -127,16 +125,9 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.all(10),
                   ),
-                  Text('You are on a login page!'),
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('Go back to prevoius page!'),
-                  ),
                   FlatButton(
                     child: Text(
-                      'Click here to sign up.',
+                      'Kliknij tu, aby się zarejestrować',
                     ),
                     onPressed: () {
                       Navigator.push(
@@ -146,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                   FlatButton(
-                    child: Text('Check?'),
+                    child: Text('Login'),
                     onPressed: () {
                       if (_textLogin.text == "" || _textPassword.text == "") {
                         return null;
