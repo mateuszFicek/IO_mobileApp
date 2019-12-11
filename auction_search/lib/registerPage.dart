@@ -8,10 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-// TODO:
-// - zrobic mozliwosc rejestracji z serwerem
-// - poprawic teksty w formularzach
-
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key, this.title}) : super(key: key);
   static const String routeName = "/registerPage";
@@ -41,7 +37,6 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     var params = {"username": username, "password": password, "email": email};
     var jsonResponse;
-    print(json.encode(params));
     var response = await http.post(
         "https://fast-everglades-04594.herokuapp.com/register",
         body: json.encode(params),
@@ -55,7 +50,8 @@ class _RegisterPageState extends State<RegisterPage> {
         _isLoading = false;
       });
       user.setInt("userid", jsonResponse['id']);
-      User currentUser = User.fromJson(jsonResponse);
+      user.setString("username", jsonResponse['username']);
+      user.setString("email", jsonResponse['email']);
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
               builder: (BuildContext context) => CurrentRequests()),
@@ -83,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onSaved: (value) => _login = value,
@@ -106,7 +102,7 @@ class _RegisterPageState extends State<RegisterPage> {
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onSaved: (value) => _email = value,
@@ -130,7 +126,7 @@ class _RegisterPageState extends State<RegisterPage> {
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onSaved: (value) => _password = value,
@@ -154,7 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onSaved: (value) => _passwordAgain = value,

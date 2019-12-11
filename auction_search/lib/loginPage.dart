@@ -7,11 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-// TODO:
-// - pusuwac wszystkie zbedne printy
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
-  static const String routeName = "/registerPage";
   final String title;
   @override
   _LoginPageState createState() => new _LoginPageState();
@@ -41,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
         user.setInt("userid", jsonResponse['id']);
         user.setString("username", jsonResponse['username']);
         user.setString("password", password);
-        User currentUser = User.fromJson(jsonResponse);
+        user.setString("date", jsonResponse['date'].toString());
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (BuildContext context) => CurrentRequests()),
@@ -67,12 +64,14 @@ class _LoginPageState extends State<LoginPage> {
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
           suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.black),
-            onPressed: () {},
+            icon: Icon(Icons.clear, color: Colors.white),
+            onPressed: () {
+              _textLogin.clear();
+            },
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onChanged: (value) => _login = value,
@@ -92,14 +91,14 @@ class _LoginPageState extends State<LoginPage> {
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
           suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.black),
+            icon: Icon(Icons.clear, color: Colors.white),
             onPressed: () {
-              print(_password);
+              _textPassword.clear();
             },
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onChanged: (value) => _password = value,

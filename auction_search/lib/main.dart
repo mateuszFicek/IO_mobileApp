@@ -10,16 +10,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Auction Search',
         theme: ThemeData(
-          primarySwatch: Colors.grey,
-        ),
+            primarySwatch: Colors.grey,
+            fontFamily: "Montserrat",
+            backgroundColor: Colors.grey),
         home: FutureBuilder<bool>(
           future: showLoginPage(),
           builder: (context, snapshot) {
             if (snapshot.hasData == true) {
               if (snapshot.data) {
-                print(snapshot.data);
                 return CurrentRequests();
               } else {
                 return MyHomePage(title: 'Main Screen');
@@ -59,18 +59,18 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text('Welcome to'),
+              Text(
+                'Witaj w',
+                style: TextStyle(fontSize: 30),
+              ),
               Text('Auction Search',
-                  style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 30,
-                      color: Colors.black)),
+                  style: TextStyle(fontSize: 45, color: Colors.black)),
               Padding(
-                padding: EdgeInsets.only(top: 50),
+                padding: EdgeInsets.only(top: 200),
               ),
               FlatButton(
                 child: Text(
-                  'Sign in',
+                  'Zaloguj się',
                   style: TextStyle(fontSize: 20),
                 ),
                 onPressed: () {
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               FlatButton(
                 child: Text(
-                  'Sign up',
+                  'Zarejestruj się',
                   style: TextStyle(fontSize: 20),
                 ),
                 onPressed: () {

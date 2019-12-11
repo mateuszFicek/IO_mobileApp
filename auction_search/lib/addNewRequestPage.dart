@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 //TODO:
-// - zmienić wygląd i napisy, ktore pojawiaja sie
 // - dodac ze nie mozna zostawic pustego pola
+// - zmienic onChange na onSaved poprzez dodanie formKey
 class AddNewRequestPage extends StatefulWidget {
   AddNewRequestPage({Key key, this.title}) : super(key: key);
   final String title;
@@ -31,31 +31,24 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     String username = user.getString('username');
     String password = user.getString('password');
     int userid = user.getInt('userid');
+    final _authority = "fast-everglades-04594.herokuapp.com";
+    final _path = "/request/add";
+    final _params = {"userId": userid.toString()};
+    final _uri = Uri.https(_authority, _path, _params);
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    var params = {
-      "userid": userid,
-      "max_price": price,
-      "descripition": description
-    };
+    var params = {"maxPrice": price, "description": description};
     var jsonResponse;
-    var response = await http.post(
-        "https://fast-everglades-04594.herokuapp.com/request/add",
-        body: json.encode(params),
-        headers: {
-          HttpHeaders.authorizationHeader: basicAuth,
-          "Accept": "application/json",
-          "content-type": "application/json"
-        });
+    var response = await http.post(_uri, body: json.encode(params), headers: {
+      HttpHeaders.authorizationHeader: basicAuth,
+      "Accept": "application/json",
+      "content-type": "application/json"
+    });
     if (response.statusCode == 200) {
-      print("Body requesta = ");
-      print(response.body);
       jsonResponse = json.decode(response.body);
       setState(() {
         _isLoading = false;
       });
-      print("Udało się!");
-      Request currentRequest = Request.fromJson(jsonResponse);
       onRequestAdded();
     } else {
       setState(() {
@@ -68,10 +61,10 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Request was added"),
+        title: Text("Dodano zapytanie"),
         actions: <Widget>[
           FlatButton(
-            child: Text('Go back to all requests'),
+            child: Text('Wróć do wszystkich zapytań'),
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
@@ -96,12 +89,14 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
           suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.black),
-            onPressed: () {},
+            icon: Icon(Icons.clear, color: Colors.white),
+            onPressed: () {
+              _textDescription.clear();
+            },
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onChanged: (value) => _description = value,
@@ -120,12 +115,14 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
           filled: true,
           hintStyle: TextStyle(color: Colors.grey),
           suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.black),
-            onPressed: () {},
+            icon: Icon(Icons.clear, color: Colors.white),
+            onPressed: () {
+              _textPrice.clear();
+            },
           )),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Please enter some task';
+          return 'To pole nie może być puste';
         }
       },
       onChanged: (value) => _price = double.parse(value),
@@ -135,7 +132,10 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Dodaj nowe zapytanie"),
+        centerTitle: true,
+      ),
       body: new Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -154,9 +154,6 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
             FlatButton(
               child: Text("Dodaj zapytanie"),
               onPressed: () {
-                //Dodać funkcję do wysyłania requestów do serwera
-                print(_price.toString());
-                print(_description);
                 addNewRequest(_description, _price);
               },
             ),
