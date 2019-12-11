@@ -134,6 +134,7 @@ class _CurrentRequestsState extends State<CurrentRequests> {
       onWillPop: _onBackPressed,
       child: new Scaffold(
         floatingActionButton: FloatingActionButton(
+          key: Key("RequestsFloatingActionButton"),
           child: Icon(
             Icons.add,
             color: Colors.grey,
@@ -179,6 +180,7 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                                 ),
                               ]),
                           FlatButton(
+                            key: Key("LogoutUserButton"),
                             onPressed: () {
                               if (username != null) clearUser();
                               Navigator.of(context).pushAndRemoveUntil(

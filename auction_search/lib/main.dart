@@ -69,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.only(top: 200),
               ),
               FlatButton(
+                key: Key('loginFromMainPageKey'),
                 child: Text(
                   'Zaloguj się',
                   style: TextStyle(fontSize: 20),
@@ -81,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
               FlatButton(
+                key: Key('registerFromMainPageKey'),
                 child: Text(
                   'Zarejestruj się',
                   style: TextStyle(fontSize: 20),

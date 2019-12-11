@@ -127,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.all(10),
                   ),
                   FlatButton(
+                    key: Key('navigateToRegisterPage'),
                     child: Text(
                       'Kliknij tu, aby się zarejestrować',
                     ),
