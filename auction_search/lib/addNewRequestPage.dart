@@ -20,6 +20,9 @@ class AddNewRequestPage extends StatefulWidget {
 }
 
 class _AddNewRequestPageState extends State<AddNewRequestPage> {
+  var _formKeyPrice = GlobalKey<FormState>();
+  var _formKeyDescription = GlobalKey<FormState>();
+
   String _description;
   double _price;
   TextEditingController _textDescription = new TextEditingController();
@@ -44,6 +47,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
       "Accept": "application/json",
       "content-type": "application/json"
     });
+    print(response.statusCode);
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
       setState(() {
@@ -77,55 +81,61 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     );
   }
 
-  TextFormField buildDescriptionTextField() {
-    return TextFormField(
-      style: TextStyle(color: Colors.white),
-      controller: _textDescription,
-      autocorrect: false,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Tytuł aukcji',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.white),
-            onPressed: () {
-              _textDescription.clear();
-            },
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onChanged: (value) => _description = value,
+  Form buildDescriptionTextField() {
+    return Form(
+      key: _formKeyDescription,
+      child: TextFormField(
+        style: TextStyle(color: Colors.white),
+        controller: _textDescription,
+        autocorrect: false,
+        decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Tytuł aukcji',
+            fillColor: Colors.black,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.white),
+              onPressed: () {
+                _textDescription.clear();
+              },
+            )),
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'To pole nie może być puste';
+          }
+        },
+        // onChanged: (value) => _description = value,
+      ),
     );
   }
 
-  TextFormField buildPriceTextField() {
-    return TextFormField(
-      style: TextStyle(color: Colors.white),
-      controller: _textPrice,
-      autocorrect: false,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Cena',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.white),
-            onPressed: () {
-              _textPrice.clear();
-            },
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onChanged: (value) => _price = double.parse(value),
+  Form buildPriceTextField() {
+    return Form(
+      key: _formKeyPrice,
+      child: TextFormField(
+        style: TextStyle(color: Colors.white),
+        controller: _textPrice,
+        autocorrect: false,
+        decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Cena',
+            fillColor: Colors.black,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.white),
+              onPressed: () {
+                _textPrice.clear();
+              },
+            )),
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'To pole nie może być puste';
+          }
+        },
+        // onChanged: (value) => _price = double.parse(value),
+      ),
     );
   }
 
@@ -154,6 +164,16 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
             FlatButton(
               child: Text("Dodaj zapytanie"),
               onPressed: () {
+                setState(() {
+                  if (_formKeyPrice.currentState.validate()) {
+                    this._price = double.parse(_textPrice.text);
+                  }
+                  if (_formKeyDescription.currentState.validate()) {
+                    this._description = _textDescription.text;
+                  }
+                });
+                print(_price);
+                print(_description);
                 addNewRequest(_description, _price);
               },
             ),

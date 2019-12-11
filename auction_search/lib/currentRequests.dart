@@ -67,6 +67,10 @@ class _CurrentRequestsState extends State<CurrentRequests> {
               'Status: ${request.status.toString()}',
               style: TextStyle(fontSize: 12, color: Colors.white),
             ),
+            Text(
+              'Link Allegro: ${request.auctionLinkAllegro.toString()}',
+              style: TextStyle(fontSize: 12, color: Colors.white),
+            ),
             SizedBox(height: 4),
           ],
         ),
@@ -165,6 +169,12 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                               crossAxisAlignment: CrossAxisAlignment.baseline,
                               textBaseline: TextBaseline.alphabetic,
                               children: <Widget>[
+                                IconButton(
+                                  icon: Icon(Icons.refresh),
+                                  onPressed: () {
+                                    fetchRequests();
+                                  },
+                                ),
                                 Text(
                                   "Witaj",
                                   style: TextStyle(fontSize: 32),
