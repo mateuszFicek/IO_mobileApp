@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:auction_search/request.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // TODO:
 // - usuwanie zapytań
@@ -41,6 +42,14 @@ class _CurrentRequestsState extends State<CurrentRequests> {
     user.clear();
   }
 
+  Future<dynamic> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   Card buildItemCard(Request request) {
     return Card(
       margin: EdgeInsets.all(10.0),
@@ -67,11 +76,25 @@ class _CurrentRequestsState extends State<CurrentRequests> {
               'Status: ${request.status.toString()}',
               style: TextStyle(fontSize: 12, color: Colors.white),
             ),
-            Text(
-              'Link Allegro: ${request.auctionLinkAllegro.toString()}',
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
-            SizedBox(height: 4),
+            request.auctionLinkAllegro == null
+                ? Text(
+                    "Aukcji jeszcze nie odnaleziono",
+                    style: TextStyle(fontSize: 12, color: Colors.white),
+                  )
+                : FlatButton(
+                    onPressed: () async {
+                      var url = request.auctionLinkAllegro.toString();
+                      if (await canLaunch(url)) {
+                        await launch(url, forceSafariVC: false);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    child: Text(
+                      "Naciśnij, aby przejść do aukcji",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
+                  ),
           ],
         ),
       ),

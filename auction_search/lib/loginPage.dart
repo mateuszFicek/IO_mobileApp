@@ -15,11 +15,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  var _formKeyLogin = GlobalKey<FormState>();
+
+  var _formKeyPassword = GlobalKey<FormState>();
+
   String _login;
   String _password;
   TextEditingController _textLogin = new TextEditingController();
   TextEditingController _textPassword = new TextEditingController();
   bool _isLoading = false;
+  bool validatedData = false;
 
   signIn(String username, password) async {
     SharedPreferences user = await SharedPreferences.getInstance();
@@ -51,57 +56,63 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  TextFormField buildLoginTextField() {
-    return TextFormField(
-      key: Key("LoginTextField"),
-      style: TextStyle(color: Colors.white),
-      controller: _textLogin,
-      autocorrect: false,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Login',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.white),
-            onPressed: () {
-              _textLogin.clear();
-            },
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onChanged: (value) => _login = value,
+  Form buildLoginTextField() {
+    return Form(
+      key: _formKeyLogin,
+      child: TextFormField(
+        key: Key("LoginTextField"),
+        style: TextStyle(color: Colors.white),
+        controller: _textLogin,
+        autocorrect: false,
+        decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Login',
+            fillColor: Colors.black,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.white),
+              onPressed: () {
+                _textLogin.clear();
+              },
+            )),
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'To pole nie może być puste';
+          }
+        },
+        onChanged: (value) => _login = value,
+      ),
     );
   }
 
-  TextFormField buildPasswordTextField() {
-    return TextFormField(
-      key: Key("PasswordTextField"),
-      style: TextStyle(color: Colors.white),
-      controller: _textPassword,
-      obscureText: true,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Hasło',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.white),
-            onPressed: () {
-              _textPassword.clear();
-            },
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onChanged: (value) => _password = value,
+  Form buildPasswordTextField() {
+    return Form(
+      key: _formKeyPassword,
+      child: TextFormField(
+        key: Key("PasswordTextField"),
+        style: TextStyle(color: Colors.white),
+        controller: _textPassword,
+        obscureText: true,
+        decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Hasło',
+            fillColor: Colors.black,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.white),
+              onPressed: () {
+                _textPassword.clear();
+              },
+            )),
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'To pole nie może być puste';
+          }
+        },
+        onChanged: (value) => _password = value,
+      ),
     );
   }
 
@@ -139,18 +150,23 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                   FlatButton(
-                    child: Text('Login'),
-                    onPressed: () {
-                      if (_textLogin.text == "" || _textPassword.text == "") {
-                        return null;
-                      } else {
+                      child: Text('Login'),
+                      onPressed: () {
                         setState(() {
-                          _isLoading = true;
+                          if (_formKeyLogin.currentState.validate() &&
+                              _formKeyPassword.currentState.validate()) {
+                            this._login = _textLogin.text;
+                            this._password = _textPassword.text;
+                            validatedData = true;
+                          } else {
+                            validatedData = false;
+                          }
+                          if (validatedData) {
+                            _isLoading = true;
+                          }
                         });
-                        signIn(_textLogin.text, _textPassword.text);
-                      }
-                    },
-                  ),
+                        if (validatedData) signIn(_login, _password);
+                      }),
                 ],
               ),
             ),

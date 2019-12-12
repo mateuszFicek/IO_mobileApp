@@ -9,9 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-//TODO:
-// - dodac ze nie mozna zostawic pustego pola
-// - zmienic onChange na onSaved poprzez dodanie formKey
 class AddNewRequestPage extends StatefulWidget {
   AddNewRequestPage({Key key, this.title}) : super(key: key);
   final String title;
@@ -47,7 +44,6 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
       "Accept": "application/json",
       "content-type": "application/json"
     });
-    print(response.statusCode);
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
       setState(() {
@@ -105,7 +101,6 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
             return 'To pole nie może być puste';
           }
         },
-        // onChanged: (value) => _description = value,
       ),
     );
   }
@@ -134,7 +129,6 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
             return 'To pole nie może być puste';
           }
         },
-        // onChanged: (value) => _price = double.parse(value),
       ),
     );
   }
@@ -172,8 +166,6 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
                     this._description = _textDescription.text;
                   }
                 });
-                print(_price);
-                print(_description);
                 addNewRequest(_description, _price);
               },
             ),
