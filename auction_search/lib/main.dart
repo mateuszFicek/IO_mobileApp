@@ -3,6 +3,7 @@ import 'package:auction_search/loginPage.dart';
 import 'package:auction_search/registerPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:auction_search/resources/colors.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,8 +13,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Auction Search',
         theme: ThemeData(
-            primarySwatch: Colors.grey,
-            fontFamily: "Montserrat",
+            primarySwatch: Colors.blue,
+            fontFamily: "Oxygen",
             backgroundColor: Colors.grey),
         home: FutureBuilder<bool>(
           future: showLoginPage(),

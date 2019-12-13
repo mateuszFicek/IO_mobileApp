@@ -10,10 +10,12 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.12.0+2
-  shared_preferences: ^0.5.4+6
+  shared_preferences: ^0.5.6
   cupertino_icons: ^0.1.2
   mockito: ^4.1.1
   url_launcher: ^4.1.0
+  #google_fonts: ^0.1.1
+  intl: ^0.16.0
 
 dev_dependencies:
   flutter_test:
@@ -34,3 +36,8 @@ flutter:
         - asset: assets/fonts/Montserrat-Medium.ttf
         - asset: assets/fonts/Montserrat-Light.ttf
         - asset: assets/fonts/Montserrat-Regular.ttf
+    - family: Oxygen
+      fonts:
+        - asset: assets/fonts/Oxygen-Bold.ttf
+        - asset: assets/fonts/Oxygen-Light.ttf
+        - asset: assets/fonts/Oxygen-Regular.ttf

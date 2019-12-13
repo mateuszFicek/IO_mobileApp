@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:auction_search/User.dart';
 import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/request.dart';
+import 'package:auction_search/resources/CustomShapeClipper.dart';
+import 'package:auction_search/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +27,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
   TextEditingController _textDescription = new TextEditingController();
   TextEditingController _textPrice = new TextEditingController();
   bool _isLoading = false;
+  bool validatedData = false;
 
   Future addNewRequest(String description, double price) async {
     SharedPreferences user = await SharedPreferences.getInstance();
@@ -81,13 +84,20 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     return Form(
       key: _formKeyDescription,
       child: TextFormField(
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: fontColor),
         controller: _textDescription,
         autocorrect: false,
         decoration: InputDecoration(
-            border: InputBorder.none,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
             hintText: 'Tytuł aukcji',
-            fillColor: Colors.black,
+            fillColor: Colors.white,
             filled: true,
             hintStyle: TextStyle(color: Colors.grey),
             suffixIcon: IconButton(
@@ -109,13 +119,20 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     return Form(
       key: _formKeyPrice,
       child: TextFormField(
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: fontColor),
         controller: _textPrice,
         autocorrect: false,
         decoration: InputDecoration(
-            border: InputBorder.none,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
             hintText: 'Cena',
-            fillColor: Colors.black,
+            fillColor: Colors.white,
             filled: true,
             hintStyle: TextStyle(color: Colors.grey),
             suffixIcon: IconButton(
@@ -136,41 +153,92 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: AppBar(
-        title: Text("Dodaj nowe zapytanie"),
-        centerTitle: true,
-      ),
-      body: new Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width * 0.85,
-              child: buildDescriptionTextField(),
+      resizeToAvoidBottomPadding: false,
+      body: new Stack(
+        children: <Widget>[
+          ClipPath(
+            clipper: CustomShapeClipper(),
+            child: Container(
+              color: primaryBlue,
+              height: 250,
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        Spacer(),
+                      ]),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "Dodaj nowe zapytanie",
+                        style: TextStyle(fontSize: 32, color: Colors.white),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(3),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    "Wpisz tytuł aukcji oraz podaj cenę przedmiotu",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
             ),
-            Padding(
-              padding: EdgeInsets.all(10),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  height: 120,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  child: buildDescriptionTextField(),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  child: buildPriceTextField(),
+                ),
+                FlatButton(
+                  child: Text("Dodaj zapytanie"),
+                  onPressed: () {
+                    setState(() {
+                      if (_formKeyPrice.currentState.validate() &&
+                          _formKeyDescription.currentState.validate()) {
+                        this._price = double.parse(_textPrice.text);
+                        this._description = _textDescription.text;
+                        validatedData = true;
+                      }
+                    });
+                    if (validatedData) addNewRequest(_description, _price);
+                  },
+                ),
+              ],
             ),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.85,
-              child: buildPriceTextField(),
-            ),
-            FlatButton(
-              child: Text("Dodaj zapytanie"),
-              onPressed: () {
-                setState(() {
-                  if (_formKeyPrice.currentState.validate()) {
-                    this._price = double.parse(_textPrice.text);
-                  }
-                  if (_formKeyDescription.currentState.validate()) {
-                    this._description = _textDescription.text;
-                  }
-                });
-                addNewRequest(_description, _price);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

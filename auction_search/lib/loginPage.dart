@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:auction_search/User.dart';
 import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/registerPage.dart';
+import 'package:auction_search/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   var _formKeyLogin = GlobalKey<FormState>();
-
   var _formKeyPassword = GlobalKey<FormState>();
 
   String _login;
@@ -61,17 +61,24 @@ class _LoginPageState extends State<LoginPage> {
       key: _formKeyLogin,
       child: TextFormField(
         key: Key("LoginTextField"),
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: fontColor),
         controller: _textLogin,
         autocorrect: false,
         decoration: InputDecoration(
-            border: InputBorder.none,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
             hintText: 'Login',
-            fillColor: Colors.black,
+            fillColor: Colors.white,
             filled: true,
             hintStyle: TextStyle(color: Colors.grey),
             suffixIcon: IconButton(
-              icon: Icon(Icons.clear, color: Colors.white),
+              icon: Icon(Icons.clear, color: Colors.grey),
               onPressed: () {
                 _textLogin.clear();
               },
@@ -91,17 +98,24 @@ class _LoginPageState extends State<LoginPage> {
       key: _formKeyPassword,
       child: TextFormField(
         key: Key("PasswordTextField"),
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: fontColor),
         controller: _textPassword,
         obscureText: true,
         decoration: InputDecoration(
-            border: InputBorder.none,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
             hintText: 'Hasło',
-            fillColor: Colors.black,
+            fillColor: Colors.white,
             filled: true,
             hintStyle: TextStyle(color: Colors.grey),
             suffixIcon: IconButton(
-              icon: Icon(Icons.clear, color: Colors.white),
+              icon: Icon(Icons.clear, color: Colors.grey),
               onPressed: () {
                 _textPassword.clear();
               },

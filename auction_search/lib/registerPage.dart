@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:auction_search/User.dart';
 import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/loginPage.dart';
+import 'package:auction_search/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -22,6 +23,10 @@ class _RegisterPageState extends State<RegisterPage> {
   String _email;
   String _passwordAgain;
   bool _isLoading = false;
+  var _formKeyLogin = GlobalKey<FormState>();
+  var _formKeyPassword = GlobalKey<FormState>();
+  var _formKeyPasswordAgain = GlobalKey<FormState>();
+  var _formKeyEmail = GlobalKey<FormState>();
 
   TextEditingController _textEmail = TextEditingController();
   TextEditingController _textPasswordAgain = TextEditingController();
@@ -29,11 +34,16 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _textLogin = TextEditingController();
   TextEditingController _textPassword = TextEditingController();
 
+  bool validatedData;
+
   Future registerNewUser(String username, String password, String passwordAgain,
       String email) async {
     SharedPreferences user = await SharedPreferences.getInstance();
     if (password != passwordAgain) {
-      return;
+      setState(() {
+        _isLoading = false;
+      });
+      return "Hasła nie są identyczne";
     }
     var params = {"username": username, "password": password, "email": email};
     var jsonResponse;
@@ -63,97 +73,149 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  TextFormField buildLoginTextField() {
-    return TextFormField(
-      style: TextStyle(color: Colors.white),
-      controller: _textLogin,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Login',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.black),
-            onPressed: () {},
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onSaved: (value) => _login = value,
+  Form buildLoginTextField() {
+    return Form(
+      key: _formKeyLogin,
+      child: TextFormField(
+        style: TextStyle(color: fontColor),
+        controller: _textLogin,
+        decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            hintText: 'Login',
+            fillColor: Colors.white,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.grey),
+              onPressed: () {
+                _textLogin.clear();
+              },
+            )),
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'To pole nie może być puste';
+          }
+        },
+        onSaved: (value) => _login = value,
+      ),
     );
   }
 
-  TextFormField buildEmailTextField() {
-    return TextFormField(
-      style: TextStyle(color: Colors.white),
-      controller: _textEmail,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Email',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.black),
-            onPressed: () {},
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onSaved: (value) => _email = value,
+  Form buildEmailTextField() {
+    return Form(
+      key: _formKeyEmail,
+      child: TextFormField(
+        style: TextStyle(color: fontColor),
+        controller: _textEmail,
+        keyboardType: TextInputType.emailAddress,
+        decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            hintText: 'Email',
+            fillColor: Colors.white,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.grey),
+              onPressed: () {
+                _textEmail.clear();
+              },
+            )),
+        validator: (value) {
+          Pattern pattern =
+              r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+          RegExp regex = new RegExp(pattern);
+          if (!regex.hasMatch(value))
+            return 'Wprowadź poprawny email';
+          else
+            return null;
+        },
+        onSaved: (value) => _email = value,
+      ),
     );
   }
 
-  TextFormField buildPasswordTextField() {
-    return TextFormField(
-      style: TextStyle(color: Colors.white),
-      controller: _textPassword,
-      obscureText: true,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Hasło',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.grey),
-            onPressed: () {},
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onSaved: (value) => _password = value,
+  Form buildPasswordTextField() {
+    return Form(
+      key: _formKeyPassword,
+      child: TextFormField(
+        style: TextStyle(color: fontColor),
+        controller: _textPassword,
+        obscureText: true,
+        decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            hintText: 'Hasło',
+            fillColor: Colors.white,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.grey),
+              onPressed: () {
+                _textPassword.clear();
+              },
+            )),
+        validator: (value) {
+          if (value.length < 6) {
+            return 'Hasło nie może mieć mniej niż 6 znaków';
+          }
+        },
+        onSaved: (value) => _password = value,
+      ),
     );
   }
 
-  TextFormField buildPasswordAgainTextField() {
-    return TextFormField(
-      style: TextStyle(color: Colors.white),
-      controller: _textPasswordAgain,
-      obscureText: true,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Potwierdź hasło',
-          fillColor: Colors.black,
-          filled: true,
-          hintStyle: TextStyle(color: Colors.grey),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.grey),
-            onPressed: () {},
-          )),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'To pole nie może być puste';
-        }
-      },
-      onSaved: (value) => _passwordAgain = value,
+  Form buildPasswordAgainTextField() {
+    return Form(
+      key: _formKeyPasswordAgain,
+      child: TextFormField(
+        style: TextStyle(color: fontColor),
+        controller: _textPasswordAgain,
+        obscureText: true,
+        decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: cardBorderColor, width: 0.0),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(),
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            hintText: 'Potwierdź hasło',
+            fillColor: Colors.white,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear, color: Colors.grey),
+              onPressed: () {
+                _textPasswordAgain.clear();
+              },
+            )),
+        validator: (value) {
+          if (value.isEmpty) return 'To pole nie może być puste';
+          if (value != _password) return 'Hasła się nie zgadzają';
+        },
+        onSaved: (value) => _passwordAgain = value,
+      ),
     );
   }
 
@@ -204,8 +266,34 @@ class _RegisterPageState extends State<RegisterPage> {
                   FlatButton(
                     child: Text('Zarejestruj się'),
                     onPressed: () {
-                      registerNewUser(_textLogin.text, _textPassword.text,
-                          _textPasswordAgain.text, _textEmail.text);
+                      setState(() {
+                        if (_formKeyLogin.currentState.validate()) {
+                          validatedData = true;
+                          this._login = _textLogin.text;
+                        } else
+                          validatedData = false;
+                        if (_formKeyEmail.currentState.validate()) {
+                          validatedData = true;
+                          this._email = _textEmail.text;
+                        } else
+                          validatedData = false;
+                        if (_formKeyPassword.currentState.validate()) {
+                          validatedData = true;
+                          this._password = _textPassword.text;
+                        } else
+                          validatedData = false;
+                        if (_formKeyPasswordAgain.currentState.validate()) {
+                          validatedData = true;
+                          this._passwordAgain = _textPasswordAgain.text;
+                        } else
+                          validatedData = false;
+                        if (validatedData) {
+                          _isLoading = true;
+                        }
+                      });
+                      if (validatedData)
+                        registerNewUser(
+                            _login, _password, _passwordAgain, _email);
                     },
                   ),
                 ],

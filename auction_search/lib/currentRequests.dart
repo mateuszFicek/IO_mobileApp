@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:auction_search/addNewRequestPage.dart';
 import 'package:auction_search/main.dart';
+import 'package:auction_search/resources/CustomShapeClipper.dart';
+import 'package:auction_search/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:auction_search/request.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 // TODO:
 // - usuwanie zapytań
@@ -42,44 +45,49 @@ class _CurrentRequestsState extends State<CurrentRequests> {
     user.clear();
   }
 
-  Future<dynamic> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   Card buildItemCard(Request request) {
     return Card(
       margin: EdgeInsets.all(10.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-      color: Colors.grey,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          side: BorderSide(color: cardBorderColor)),
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(15.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Opis: ${request.description}',
+              '${request.description}',
               style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
+                  fontSize: 16, color: fontColor, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 4),
-            Text(
-              'Cena: ${request.price.toString()}',
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
-            Text(
-              'Status: ${request.status.toString()}',
-              style: TextStyle(fontSize: 12, color: Colors.white),
+            Row(children: <Widget>[
+              Icon(
+                Icons.monetization_on,
+                size: 16,
+                color: Colors.grey,
+              ),
+              Text(
+                ' ${request.price.toString()}',
+                style: TextStyle(fontSize: 12, color: fontColor),
+              ),
+            ]),
+            SizedBox(height: 2),
+            Row(
+              children: <Widget>[
+                Icon(
+                  Icons.date_range,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+                Text('${request.creationDate}')
+              ],
             ),
             request.auctionLinkAllegro == null
                 ? Text(
                     "Aukcji jeszcze nie odnaleziono",
-                    style: TextStyle(fontSize: 12, color: Colors.white),
+                    style: TextStyle(fontSize: 12, color: fontColor),
                   )
                 : FlatButton(
                     onPressed: () async {
@@ -92,7 +100,7 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                     },
                     child: Text(
                       "Naciśnij, aby przejść do aukcji",
-                      style: TextStyle(fontSize: 12, color: Colors.white),
+                      style: TextStyle(fontSize: 12, color: fontColor),
                     ),
                   ),
           ],
@@ -130,7 +138,7 @@ class _CurrentRequestsState extends State<CurrentRequests> {
             requests.add(post);
           }
       }
-      return requests;
+      return requests.reversed.toList();
     } else {
       throw Exception('Failed to load post');
     }
@@ -164,9 +172,9 @@ class _CurrentRequestsState extends State<CurrentRequests> {
           key: Key("RequestsFloatingActionButton"),
           child: Icon(
             Icons.add,
-            color: Colors.grey,
+            color: Colors.white,
           ),
-          backgroundColor: Colors.black,
+          backgroundColor: fontColor,
           onPressed: () {
             Navigator.push(
               context,
@@ -176,86 +184,115 @@ class _CurrentRequestsState extends State<CurrentRequests> {
         ),
         body: !dataIsLoaded
             ? Center(child: CircularProgressIndicator())
-            : new Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      color: Colors.grey,
-                      child: Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.all(25),
-                          ),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-                              textBaseline: TextBaseline.alphabetic,
-                              children: <Widget>[
-                                IconButton(
-                                  icon: Icon(Icons.refresh),
-                                  onPressed: () {
-                                    fetchRequests();
-                                  },
-                                ),
-                                Text(
-                                  "Witaj",
-                                  style: TextStyle(fontSize: 32),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(3),
-                                ),
-                                Text(
-                                  "$username",
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ]),
-                          FlatButton(
-                            key: Key("LogoutUserButton"),
-                            onPressed: () {
-                              if (username != null) clearUser();
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          MyHomePage()),
-                                  (Route<dynamic> route) => false);
-                            },
-                            child: Text("Wyloguj się"),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: FutureBuilder(
-                        future: fetchRequests(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.data != null) {
-                            return ListView.builder(
-                              itemCount: snapshot.data.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                var x = snapshot.data[index];
-                                return buildItemCard(x);
-                              },
-                            );
-                          } else {
-                            return Center(
-                              child: Container(
-                                child: Text(
-                                  "Naciśnij + w prawym dolnym rogu",
-                                  style: TextStyle(fontSize: 20),
-                                ),
+            : Stack(children: <Widget>[
+                Center(
+                  child: Column(
+                    children: <Widget>[
+                      ClipPath(
+                        clipper: CustomShapeClipper(),
+                        child: Container(
+                          color: primaryBlue,
+                          height: 250,
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 40,
                               ),
-                            );
-                          }
-                        },
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  children: <Widget>[
+                                    IconButton(
+                                      icon: Icon(Icons.refresh,
+                                          color: Colors.white),
+                                      onPressed: () async {
+                                        fetchRequests();
+                                      },
+                                    ),
+                                    Spacer(),
+                                    IconButton(
+                                      key: Key("LogoutUserButton"),
+                                      icon: Icon(Icons.exit_to_app,
+                                          color: Colors.white),
+                                      onPressed: () {
+                                        if (username != null) clearUser();
+                                        Navigator.of(context)
+                                            .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                    builder:
+                                                        (BuildContext
+                                                                context) =>
+                                                            MyHomePage()),
+                                                (Route<dynamic> route) =>
+                                                    false);
+                                      },
+                                    ),
+                                  ]),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    "Witaj,",
+                                    style: TextStyle(
+                                        fontSize: 32, color: Colors.white),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "$username",
+                                    style: TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 30,
+                              ),
+                              Text(
+                                "Sprawdź swoje aktualne zapytania poniżej",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      Text('Twoje aktualne zapytania'),
+                      Expanded(
+                        child: FutureBuilder(
+                          future: fetchRequests(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.data != null) {
+                              return ListView.builder(
+                                itemCount: snapshot.data.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  var x = snapshot.data[index];
+                                  return buildItemCard(x);
+                                },
+                              );
+                            } else {
+                              return Center(
+                                child: Container(
+                                  child: Text(
+                                    "Naciśnij + w prawym dolnym rogu",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ]),
       ),
     );
   }
