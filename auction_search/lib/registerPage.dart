@@ -232,121 +232,125 @@ class _RegisterPageState extends State<RegisterPage> {
     return new Scaffold(
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Stack(
-              children: <Widget>[
-                Center(
-                  child: Column(
-                    children: <Widget>[
-                      ClipPath(
-                        clipper: CustomShapeClipper(),
-                        child: Container(
-                          color: primaryBlue,
-                          height: 250,
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                'Zarejestruj się',
-                                style: TextStyle(
-                                    fontSize: 30, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height - 250,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.85,
-                                  child: buildLoginTextField()),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                              ),
-                              Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.85,
-                                  child: buildEmailTextField()),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                              ),
-                              Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.85,
-                                  child: buildPasswordTextField()),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                              ),
-                              Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.85,
-                                  child: buildPasswordAgainTextField()),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                              ),
-                              FlatButton(
-                                child: Text(
-                                  'Kliknij tu, aby się zalogować',
+          : SingleChildScrollView(
+              child: Stack(
+                children: <Widget>[
+                  Center(
+                    child: Column(
+                      children: <Widget>[
+                        ClipPath(
+                          clipper: CustomShapeClipper(),
+                          child: Container(
+                            color: primaryBlue,
+                            height: 250,
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  'Zarejestruj się',
+                                  style: TextStyle(
+                                      fontSize: 30, color: Colors.white),
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => LoginPage()),
-                                  );
-                                },
-                              ),
-                              FlatButton(
-                                child: Text('Zarejestruj się'),
-                                onPressed: () {
-                                  setState(() {
-                                    if (_formKeyLogin.currentState.validate()) {
-                                      validatedData = true;
-                                      this._login = _textLogin.text;
-                                    } else
-                                      validatedData = false;
-                                    if (_formKeyEmail.currentState.validate()) {
-                                      validatedData = true;
-                                      this._email = _textEmail.text;
-                                    } else
-                                      validatedData = false;
-                                    if (_formKeyPassword.currentState
-                                        .validate()) {
-                                      validatedData = true;
-                                      this._password = _textPassword.text;
-                                    } else
-                                      validatedData = false;
-                                    if (_formKeyPasswordAgain.currentState
-                                        .validate()) {
-                                      validatedData = true;
-                                      this._passwordAgain =
-                                          _textPasswordAgain.text;
-                                    } else
-                                      validatedData = false;
-                                    if (validatedData) {
-                                      _isLoading = true;
-                                    }
-                                  });
-                                  if (validatedData)
-                                    registerNewUser(_login, _password,
-                                        _passwordAgain, _email);
-                                },
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        Container(
+                          height: MediaQuery.of(context).size.height - 250,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: buildLoginTextField()),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                ),
+                                Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: buildEmailTextField()),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                ),
+                                Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: buildPasswordTextField()),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                ),
+                                Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: buildPasswordAgainTextField()),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                ),
+                                FlatButton(
+                                  child: Text(
+                                    'Kliknij tu, aby się zalogować',
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginPage()),
+                                    );
+                                  },
+                                ),
+                                FlatButton(
+                                  child: Text('Zarejestruj się'),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (_formKeyLogin.currentState
+                                          .validate()) {
+                                        validatedData = true;
+                                        this._login = _textLogin.text;
+                                      } else
+                                        validatedData = false;
+                                      if (_formKeyEmail.currentState
+                                          .validate()) {
+                                        validatedData = true;
+                                        this._email = _textEmail.text;
+                                      } else
+                                        validatedData = false;
+                                      if (_formKeyPassword.currentState
+                                          .validate()) {
+                                        validatedData = true;
+                                        this._password = _textPassword.text;
+                                      } else
+                                        validatedData = false;
+                                      if (_formKeyPasswordAgain.currentState
+                                          .validate()) {
+                                        validatedData = true;
+                                        this._passwordAgain =
+                                            _textPasswordAgain.text;
+                                      } else
+                                        validatedData = false;
+                                      if (validatedData) {
+                                        _isLoading = true;
+                                      }
+                                    });
+                                    if (validatedData)
+                                      registerNewUser(_login, _password,
+                                          _passwordAgain, _email);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }

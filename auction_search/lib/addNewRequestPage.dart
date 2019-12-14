@@ -106,7 +106,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
             filled: true,
             hintStyle: TextStyle(color: Colors.grey),
             suffixIcon: IconButton(
-              icon: Icon(Icons.clear, color: Colors.white),
+              icon: Icon(Icons.clear, color: Colors.grey),
               onPressed: () {
                 _textDescription.clear();
               },
@@ -142,7 +142,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
             filled: true,
             hintStyle: TextStyle(color: Colors.grey),
             suffixIcon: IconButton(
-              icon: Icon(Icons.clear, color: Colors.white),
+              icon: Icon(Icons.clear, color: Colors.grey),
               onPressed: () {
                 _textPrice.clear();
               },
@@ -159,94 +159,107 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      resizeToAvoidBottomPadding: false,
-      body: new Stack(
-        children: <Widget>[
-          ClipPath(
-            clipper: CustomShapeClipper(),
-            child: Container(
-              color: primaryBlue,
-              height: 250,
-              alignment: Alignment.centerLeft,
+      body: SingleChildScrollView(
+        child: Stack(
+          children: <Widget>[
+            Center(
               child: Column(
                 children: <Widget>[
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: <Widget>[
-                        IconButton(
-                          key: Key('BackIcon'),
-                          icon: Icon(Icons.arrow_back, color: Colors.white),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        Spacer(),
-                      ]),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Dodaj nowe zapytanie",
-                        style: TextStyle(fontSize: 32, color: Colors.white),
+                  ClipPath(
+                    clipper: CustomShapeClipper(),
+                    child: Container(
+                      color: primaryBlue,
+                      height: 250,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 40,
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: <Widget>[
+                                IconButton(
+                                  key: Key('BackIcon'),
+                                  icon: Icon(Icons.arrow_back,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                Spacer(),
+                              ]),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                "Dodaj nowe zapytanie",
+                                style: TextStyle(
+                                    fontSize: 32, color: Colors.white),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(3),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Text(
+                            "Wpisz tytuł aukcji oraz podaj cenę przedmiotu",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(3),
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height - 250,
+                    child: Center(
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 120,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            child: buildDescriptionTextField(),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            child: buildPriceTextField(),
+                          ),
+                          FlatButton(
+                            key: Key('AddRequestButton'),
+                            child: Text("Dodaj zapytanie"),
+                            onPressed: () {
+                              setState(() {
+                                if (_formKeyPrice.currentState.validate() &&
+                                    _formKeyDescription.currentState
+                                        .validate()) {
+                                  this._price = double.parse(_textPrice.text);
+                                  this._description = _textDescription.text;
+                                  validatedData = true;
+                                }
+                              });
+                              if (validatedData)
+                                addNewRequest(_description, _price);
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    "Wpisz tytuł aukcji oraz podaj cenę przedmiotu",
-                    style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  height: 120,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: buildDescriptionTextField(),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(10),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: buildPriceTextField(),
-                ),
-                FlatButton(
-                  key: Key('AddRequestButton'),
-                  child: Text("Dodaj zapytanie"),
-                  onPressed: () {
-                    setState(() {
-                      if (_formKeyPrice.currentState.validate() &&
-                          _formKeyDescription.currentState.validate()) {
-                        this._price = double.parse(_textPrice.text);
-                        this._description = _textDescription.text;
-                        validatedData = true;
-                      }
-                    });
-                    if (validatedData) addNewRequest(_description, _price);
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
