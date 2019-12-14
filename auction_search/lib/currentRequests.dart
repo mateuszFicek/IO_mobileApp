@@ -81,9 +81,27 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                   size: 16,
                   color: Colors.grey,
                 ),
-                Text('${request.creationDate}')
+                Text(
+                  ' ${request.creationDate}',
+                  style: TextStyle(fontSize: 12, color: fontColor),
+                )
               ],
             ),
+            SizedBox(height: 2),
+            Row(
+              children: <Widget>[
+                Icon(
+                  Icons.info,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+                Text(
+                  ' ${request.status}',
+                  style: TextStyle(fontSize: 12, color: fontColor),
+                )
+              ],
+            ),
+            SizedBox(height: 2),
             request.auctionLinkAllegro == null
                 ? Text(
                     "Aukcji jeszcze nie odnaleziono",
@@ -201,9 +219,7 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                               ),
                               Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.baseline,
-                                  textBaseline: TextBaseline.alphabetic,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     IconButton(
                                       icon: Icon(Icons.refresh,
@@ -211,6 +227,12 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                                       onPressed: () async {
                                         fetchRequests();
                                       },
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      'Hunto',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
                                     ),
                                     Spacer(),
                                     IconButton(

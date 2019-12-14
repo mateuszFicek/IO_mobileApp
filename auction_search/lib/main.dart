@@ -1,6 +1,7 @@
 import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/loginPage.dart';
 import 'package:auction_search/registerPage.dart';
+import 'package:auction_search/resources/CustomShapeClipper.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auction_search/resources/colors.dart';
@@ -56,46 +57,72 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
+        children: <Widget>[
+          Column(
             children: <Widget>[
-              Text(
-                'Witaj w',
-                style: TextStyle(fontSize: 30),
-              ),
-              Text('Auction Search',
-                  style: TextStyle(fontSize: 45, color: Colors.black)),
-              Padding(
-                padding: EdgeInsets.only(top: 200),
-              ),
-              FlatButton(
-                key: Key('loginFromMainPageKey'),
-                child: Text(
-                  'Zaloguj się',
-                  style: TextStyle(fontSize: 20),
+              ClipPath(
+                clipper: CustomShapeClipper(),
+                child: Container(
+                  color: primaryBlue,
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Witaj w',
+                        style: TextStyle(fontSize: 30, color: Colors.white),
+                      ),
+                      Text('Hunto',
+                          style: TextStyle(fontSize: 100, color: Colors.white)),
+                    ],
+                  ),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                },
               ),
-              FlatButton(
-                key: Key('registerFromMainPageKey'),
-                child: Text(
-                  'Zarejestruj się',
-                  style: TextStyle(fontSize: 20),
+              Container(
+                height: MediaQuery.of(context).size.height * 0.5,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      FlatButton(
+                        key: Key('loginFromMainPageKey'),
+                        child: Text(
+                          'Zaloguj się',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                          );
+                        },
+                      ),
+                      FlatButton(
+                        key: Key('registerFromMainPageKey'),
+                        child: Text(
+                          'Zarejestruj się',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RegisterPage()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
-                  );
-                },
               ),
-            ]),
+            ],
+          ),
+        ],
       ),
     );
   }

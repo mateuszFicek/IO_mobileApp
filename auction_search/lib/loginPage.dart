@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:auction_search/User.dart';
 import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/registerPage.dart';
+import 'package:auction_search/resources/CustomShapeClipper.dart';
 import 'package:auction_search/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -135,54 +136,93 @@ class _LoginPageState extends State<LoginPage> {
     return new Scaffold(
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      child: buildLoginTextField()),
-                  Padding(
-                    padding: EdgeInsets.all(10),
+          : Stack(
+              children: <Widget>[
+                Center(
+                  child: Column(
+                    children: <Widget>[
+                      ClipPath(
+                        clipper: CustomShapeClipper(),
+                        child: Container(
+                          color: primaryBlue,
+                          height: 250,
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                'Zaloguj się',
+                                style: TextStyle(
+                                    fontSize: 30, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height - 250,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
+                                  child: buildLoginTextField()),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                              ),
+                              Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
+                                  child: buildPasswordTextField()),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                              ),
+                              FlatButton(
+                                key: Key('navigateToRegisterPage'),
+                                child: Text(
+                                  'Kliknij tu, aby się zarejestrować',
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RegisterPage()),
+                                  );
+                                },
+                              ),
+                              FlatButton(
+                                  child: Text('Login'),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (_formKeyLogin.currentState
+                                              .validate() &&
+                                          _formKeyPassword.currentState
+                                              .validate()) {
+                                        this._login = _textLogin.text;
+                                        this._password = _textPassword.text;
+                                        validatedData = true;
+                                      } else {
+                                        validatedData = false;
+                                      }
+                                      if (validatedData) {
+                                        _isLoading = true;
+                                      }
+                                    });
+                                    if (validatedData)
+                                      signIn(_login, _password);
+                                  }),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      child: buildPasswordTextField()),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                  ),
-                  FlatButton(
-                    key: Key('navigateToRegisterPage'),
-                    child: Text(
-                      'Kliknij tu, aby się zarejestrować',
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RegisterPage()),
-                      );
-                    },
-                  ),
-                  FlatButton(
-                      child: Text('Login'),
-                      onPressed: () {
-                        setState(() {
-                          if (_formKeyLogin.currentState.validate() &&
-                              _formKeyPassword.currentState.validate()) {
-                            this._login = _textLogin.text;
-                            this._password = _textPassword.text;
-                            validatedData = true;
-                          } else {
-                            validatedData = false;
-                          }
-                          if (validatedData) {
-                            _isLoading = true;
-                          }
-                        });
-                        if (validatedData) signIn(_login, _password);
-                      }),
-                ],
-              ),
+                ),
+              ],
             ),
     );
   }
