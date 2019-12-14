@@ -4,6 +4,7 @@ import 'package:http/http.dart' show Client;
 import '../User.dart';
 import 'dart:convert';
 
+/// Klasa do testowania odpowiedzi z serwera.
 class ApiProvider {
   static String username = "user";
   static String password = "user";

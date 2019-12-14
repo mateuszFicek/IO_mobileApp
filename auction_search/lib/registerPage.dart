@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+/// Strona do rejestracji użytkownika/
+/// Zawiera cztery pola: login, email, hasło oraz powtórzone hasło.
+/// Pozwala na rejestrację użytkownika oraz daje mu dostęp do głównej części aplikacji.
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key, this.title}) : super(key: key);
   static const String routeName = "/registerPage";
@@ -78,6 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Form(
       key: _formKeyLogin,
       child: TextFormField(
+        key: Key('registerLoginForm'),
         style: TextStyle(color: fontColor),
         controller: _textLogin,
         decoration: InputDecoration(
@@ -113,6 +117,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Form(
       key: _formKeyEmail,
       child: TextFormField(
+        key: Key('registerEmailForm'),
         style: TextStyle(color: fontColor),
         controller: _textEmail,
         keyboardType: TextInputType.emailAddress,
@@ -153,6 +158,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Form(
       key: _formKeyPassword,
       child: TextFormField(
+        key: Key('registerPasswordForm'),
         style: TextStyle(color: fontColor),
         controller: _textPassword,
         obscureText: true,
@@ -189,6 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Form(
       key: _formKeyPasswordAgain,
       child: TextFormField(
+        key: Key('registerPasswordAgainForm'),
         style: TextStyle(color: fontColor),
         controller: _textPasswordAgain,
         obscureText: true,

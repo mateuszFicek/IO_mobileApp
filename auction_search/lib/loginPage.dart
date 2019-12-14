@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+/// Strona do logowania się.
+/// Użytkownik posiadający konto może zalogować się poprzez podanie prawidłowego loginu oraz hasła.
+/// Jeśli użytkownik nie posiada konta może przejść do strony z rejestracją.
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
   final String title;

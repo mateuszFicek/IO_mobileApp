@@ -1,5 +1,6 @@
 import 'package:auction_search/User.dart';
 
+/// Klasa zapytania, która zawiera w sobie atrybuty, które określają zapytanie w aplikacji oraz serwerze.
 class Request {
   final int requestId;
   final String description;
@@ -20,6 +21,7 @@ class Request {
       this.auctionLinkAllegro,
       this.auctionLinkEbay});
 
+  /// Funkcja, która zamienia json otrzymany z serwera na obiekt typu Request.
   factory Request.fromJson(Map<String, dynamic> json) {
     return Request(
       requestId: json['id'],

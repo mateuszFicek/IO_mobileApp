@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:auction_search/User.dart';
 import 'package:auction_search/currentRequests.dart';
 import 'package:auction_search/request.dart';
@@ -11,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+/// Strona do dodawania nowego zapytania.
+/// Użytkownik proszony jest o podanie tytułu aukcji oraz ceny.
 class AddNewRequestPage extends StatefulWidget {
   AddNewRequestPage({Key key, this.title}) : super(key: key);
   final String title;
@@ -29,6 +30,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
   bool _isLoading = false;
   bool validatedData = false;
 
+  /// Funkcja, która wysyła przygotowane zapytanie na serwer.
   Future addNewRequest(String description, double price) async {
     SharedPreferences user = await SharedPreferences.getInstance();
     String username = user.getString('username');
@@ -60,6 +62,8 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     }
   }
 
+  /// Funkcja, która obsługuje aplikację po dodaniu zapytania.
+  /// Po dodaniu zapytania użytkownik powraca do strony ze wszystkimi zapytaniami.
   Future<bool> onRequestAdded() {
     return showDialog(
       context: context,
@@ -80,6 +84,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     );
   }
 
+  /// Formularz, który pobiera od użytkownika tytuł funkcji.
   Form buildDescriptionTextField() {
     return Form(
       key: _formKeyDescription,
@@ -115,6 +120,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
     );
   }
 
+  /// Formularz, który pobiera od użytkownika tytuł cenę.
   Form buildPriceTextField() {
     return Form(
       key: _formKeyPrice,
@@ -173,6 +179,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
                       textBaseline: TextBaseline.alphabetic,
                       children: <Widget>[
                         IconButton(
+                          key: Key('BackIcon'),
                           icon: Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () {
                             Navigator.of(context).pop();
@@ -222,6 +229,7 @@ class _AddNewRequestPageState extends State<AddNewRequestPage> {
                   child: buildPriceTextField(),
                 ),
                 FlatButton(
+                  key: Key('AddRequestButton'),
                   child: Text("Dodaj zapytanie"),
                   onPressed: () {
                     setState(() {

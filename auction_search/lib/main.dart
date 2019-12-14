@@ -8,6 +8,8 @@ import 'package:auction_search/resources/colors.dart';
 
 void main() => runApp(MyApp());
 
+/// Strona główna aplikacji.
+/// Zawiera dwa przyciski, które pozwalają przejść do strony logowania lub rejestracji.
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+/// Funkcja, która sprawdza czy użytkownik już się zalogował.
+/// Zwraca true jeśli na urządzeniu znajdują się dane użytkownika.
 Future<bool> showLoginPage() async {
   var userLogged = await SharedPreferences.getInstance();
   String user = userLogged.getString('username');

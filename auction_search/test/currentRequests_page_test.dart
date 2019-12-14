@@ -39,5 +39,6 @@ void main() {
 
     verify(mockObserver.didPush(any, any));
     expect(find.byType(AddNewRequestPage), findsOneWidget);
+    print("Przejście do strony dodawania nowego zapytania.");
   });
 }

@@ -24,12 +24,7 @@ void main() {
     verify(mockObserver.didPush(any, any));
   }
 
-  Future<Null> _navigateToRegisterPage(WidgetTester tester) async {
-    await tester.tap(find.byKey(Key('navigateToRegisterPage')));
-    await tester.pumpAndSettle();
-  }
-
-  testWidgets('Finding widgets on page', (WidgetTester tester) async {
+  testWidgets('Finding widgets on Login page', (WidgetTester tester) async {
     Widget buildTestableWidget(Widget widget) {
       return MediaQuery(
           data: MediaQueryData(), child: MaterialApp(home: widget));
@@ -39,6 +34,7 @@ void main() {
     expect(find.byKey(Key("LoginTextField")), findsOneWidget);
     expect(find.byKey(Key("PasswordTextField")), findsOneWidget);
     expect(find.byKey(Key("navigateToRegisterPage")), findsOneWidget);
+    print('Znajdowanie widgetów na stronie logowania.');
   });
 
   testWidgets('Testing server response', (WidgetTester tester) async {
@@ -49,13 +45,6 @@ void main() {
     });
     final item = await apiProvider.fetchUser();
     expect(item.username, "user");
-  });
-
-  testWidgets('Going to register page', (WidgetTester tester) async {
-    await _buildMainPage(tester);
-    await _navigateToRegisterPage(tester);
-
-    verify(mockObserver.didPush(any, any));
-    expect(find.byType(RegisterPage), findsOneWidget);
+    print('Testowanie odpowiedzi serwera.');
   });
 }

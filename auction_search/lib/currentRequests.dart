@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:auction_search/addNewRequestPage.dart';
 import 'package:auction_search/main.dart';
 import 'package:auction_search/resources/CustomShapeClipper.dart';
@@ -14,16 +13,105 @@ import 'package:auction_search/request.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
-// TODO:
-// - usuwanie zapytań
-// - edycja zapytań
-// - podgląd zapytania
-
+/// Strona z aktualnie przetwarzanymi zapytaniami.
+/// Użytkownik ma do niej dostęp tylko po zalogowaniu.
+/// Możliwość wylogowania oraz przejścia do strony gdzie można dodać nowe zapytanie.
 class CurrentRequests extends StatefulWidget {
   CurrentRequests({Key key, this.title}) : super(key: key);
   final String title;
   @override
   _CurrentRequestsState createState() => new _CurrentRequestsState();
+}
+
+/// Usuwa dane użytkownika z pamięci urządzenia.
+Future clearUser() async {
+  final SharedPreferences user = await SharedPreferences.getInstance();
+  user.clear();
+}
+
+/// Widget pojedynczej karty, która zawiera dane o zapytaniu.
+/// Użytkownik ma możliwość sprawdzenia stanu zapytania, tytułu oraz ceny maksymalnej.
+/// Funkcja bezpośredniego linku do aukcji.
+Card buildItemCard(Request request) {
+  return Card(
+    margin: EdgeInsets.all(10.0),
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(color: cardBorderColor)),
+    child: Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            '${request.description}',
+            style: TextStyle(
+                fontSize: 16, color: fontColor, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4),
+          Row(children: <Widget>[
+            Icon(
+              Icons.monetization_on,
+              size: 16,
+              color: Colors.grey,
+            ),
+            Text(
+              ' ${request.price.toString()}',
+              style: TextStyle(fontSize: 12, color: fontColor),
+            ),
+          ]),
+          SizedBox(height: 2),
+          Row(
+            children: <Widget>[
+              Icon(
+                Icons.date_range,
+                size: 16,
+                color: Colors.grey,
+              ),
+              Text(
+                ' ${request.creationDate.substring(0, 10)}',
+                style: TextStyle(fontSize: 12, color: fontColor),
+              )
+            ],
+          ),
+          SizedBox(height: 2),
+          Row(
+            children: <Widget>[
+              Icon(
+                Icons.info,
+                size: 16,
+                color: Colors.grey,
+              ),
+              Text(
+                ' ${request.status}',
+                style: TextStyle(fontSize: 12, color: fontColor),
+              )
+            ],
+          ),
+          SizedBox(height: 2),
+          request.auctionLinkAllegro == null
+              ? Text(
+                  "Aukcji jeszcze nie odnaleziono",
+                  style: TextStyle(fontSize: 12, color: fontColor),
+                )
+              : FlatButton(
+                  onPressed: () async {
+                    var url = request.auctionLinkAllegro.toString();
+                    if (await canLaunch(url)) {
+                      await launch(url, forceSafariVC: false);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Text(
+                    "Naciśnij, aby przejść do aukcji",
+                    style: TextStyle(fontSize: 12, color: fontColor),
+                  ),
+                ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _CurrentRequestsState extends State<CurrentRequests> {
@@ -40,93 +128,28 @@ class _CurrentRequestsState extends State<CurrentRequests> {
     loadUser();
   }
 
-  Future clearUser() async {
-    final SharedPreferences user = await SharedPreferences.getInstance();
-    user.clear();
-  }
-
-  Card buildItemCard(Request request) {
-    return Card(
-      margin: EdgeInsets.all(10.0),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          side: BorderSide(color: cardBorderColor)),
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '${request.description}',
-              style: TextStyle(
-                  fontSize: 16, color: fontColor, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 4),
-            Row(children: <Widget>[
-              Icon(
-                Icons.monetization_on,
-                size: 16,
-                color: Colors.grey,
-              ),
-              Text(
-                ' ${request.price.toString()}',
-                style: TextStyle(fontSize: 12, color: fontColor),
-              ),
-            ]),
-            SizedBox(height: 2),
-            Row(
-              children: <Widget>[
-                Icon(
-                  Icons.date_range,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-                Text(
-                  ' ${request.creationDate}',
-                  style: TextStyle(fontSize: 12, color: fontColor),
-                )
-              ],
-            ),
-            SizedBox(height: 2),
-            Row(
-              children: <Widget>[
-                Icon(
-                  Icons.info,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-                Text(
-                  ' ${request.status}',
-                  style: TextStyle(fontSize: 12, color: fontColor),
-                )
-              ],
-            ),
-            SizedBox(height: 2),
-            request.auctionLinkAllegro == null
-                ? Text(
-                    "Aukcji jeszcze nie odnaleziono",
-                    style: TextStyle(fontSize: 12, color: fontColor),
-                  )
-                : FlatButton(
-                    onPressed: () async {
-                      var url = request.auctionLinkAllegro.toString();
-                      if (await canLaunch(url)) {
-                        await launch(url, forceSafariVC: false);
-                      } else {
-                        throw 'Could not launch $url';
-                      }
-                    },
-                    child: Text(
-                      "Naciśnij, aby przejść do aukcji",
-                      style: TextStyle(fontSize: 12, color: fontColor),
-                    ),
-                  ),
-          ],
-        ),
+  /// Funkcja do obsługi wciśnięcia przez użytkownika wyjścia z aplikacji.
+  /// Sprawdza czy użytkownik całkowicie chce zamknąć aplikację.
+  Future<bool> _onBackPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Czy chcesz zamknąć aplikację?"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Tak'),
+            onPressed: () => SystemNavigator.pop(),
+          ),
+          FlatButton(
+            child: Text('Nie'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+        ],
       ),
     );
   }
 
+  /// Funkcja wczytuje dane użytkownika, które zostały podane podczas logowania/rejestracji.
   Future loadUser() async {
     final SharedPreferences user = await SharedPreferences.getInstance();
     if (user.getString('username') != null) {
@@ -139,6 +162,8 @@ class _CurrentRequestsState extends State<CurrentRequests> {
     }
   }
 
+  /// Funkcja, która pobiera wszystkie zapytania, które użytkownik dodał od aplikacji.
+  /// Zwraca listę zapytań.
   Future<List<Request>> fetchRequests() async {
     List<Request> requests = [];
     String basicAuth =
@@ -160,25 +185,6 @@ class _CurrentRequestsState extends State<CurrentRequests> {
     } else {
       throw Exception('Failed to load post');
     }
-  }
-
-  Future<bool> _onBackPressed() {
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Czy chcesz zamknąć aplikację?"),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Tak'),
-            onPressed: () => SystemNavigator.pop(),
-          ),
-          FlatButton(
-            child: Text('Nie'),
-            onPressed: () => Navigator.pop(context, false),
-          ),
-        ],
-      ),
-    );
   }
 
   @override

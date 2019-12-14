@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// Klasa użytkownik, która zawiera w sobie atrybuty, które określają użytkownika w aplikacji oraz serwerze.
+
 class User {
   final String username;
   final int userid;
@@ -15,6 +17,8 @@ class User {
       this.enabled,
       this.email,
       this.date});
+
+  /// Funkcja, która zamienia json otrzymany z serwera na obiekt typu User.
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
         userid: json['id'],

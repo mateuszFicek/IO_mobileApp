@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// Klasa, która zwraca ścieżkę do stworzenia UI.
+/// Krzywa, które przechodzi przez pewne punkty i na jej podstawie przycina Container do odpowiadającego kształtu.
 class CustomShapeClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

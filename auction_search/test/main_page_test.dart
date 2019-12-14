@@ -27,23 +27,10 @@ void main() {
     verify(mockObserver.didPush(any, any));
   }
 
-  Future<Null> _navigateToRegisterPage(WidgetTester tester) async {
-    await tester.tap(find.byKey(Key('registerFromMainPageKey')));
-    await tester.pumpAndSettle();
-  }
-
   Future<Null> _navigateToLoginPage(WidgetTester tester) async {
     await tester.tap(find.byKey(Key('loginFromMainPageKey')));
     await tester.pumpAndSettle();
   }
-
-  testWidgets('Going to register page', (WidgetTester tester) async {
-    await _buildMainPage(tester);
-    await _navigateToRegisterPage(tester);
-
-    verify(mockObserver.didPush(any, any));
-    expect(find.byType(RegisterPage), findsOneWidget);
-  });
 
   testWidgets('Going to login page', (WidgetTester tester) async {
     await _buildMainPage(tester);
@@ -51,5 +38,6 @@ void main() {
 
     verify(mockObserver.didPush(any, any));
     expect(find.byType(LoginPage), findsOneWidget);
+    print('Przechodzenie na stronę z logowaniem.');
   });
 }
