@@ -27,6 +27,7 @@ class CurrentRequests extends StatefulWidget {
 Future clearUser() async {
   final SharedPreferences user = await SharedPreferences.getInstance();
   user.clear();
+  return true;
 }
 
 /// Widget pojedynczej karty, która zawiera dane o zapytaniu.

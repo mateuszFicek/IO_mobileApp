@@ -40,4 +40,24 @@ void main() {
     expect(find.byType(LoginPage), findsOneWidget);
     print('Przechodzenie na stronę z logowaniem.');
   });
+
+  test('Test SharedPreferences setup', () async {
+    SharedPreferences.setMockInitialValues(({'username': 'user'}));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var user = prefs.getString('username');
+    expect(user, 'user');
+    print("Zapisywanie danych użytkownika w pamięci telefonu.");
+  });
+
+  test('Test SharedPreferences setup', () async {
+    SharedPreferences.setMockInitialValues(({'username': 'user'}));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var user = prefs.getString('username');
+    bool s;
+    await showLoginPage().then((value) {
+      s = value;
+    });
+    expect(s, true);
+    print("Sprawdzanie czy użytkownik jest zalogowany na urządzeniu");
+  });
 }

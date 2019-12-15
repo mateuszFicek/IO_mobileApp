@@ -41,4 +41,16 @@ void main() {
     expect(find.byType(AddNewRequestPage), findsOneWidget);
     print("Przejście do strony dodawania nowego zapytania.");
   });
+
+  test('Test SharedPreferences setup', () async {
+    SharedPreferences.setMockInitialValues(({'username': 'user'}));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var user = prefs.getString('username');
+    bool s;
+    await clearUser().then((value) {
+      s = value;
+    });
+    expect(s, true);
+    print("Sprawdzanie czy użytkownik został wylogowany.");
+  });
 }
