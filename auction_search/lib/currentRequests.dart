@@ -30,6 +30,16 @@ Future clearUser() async {
   return true;
 }
 
+Future deleteRequest(int requestId) async {
+  var response = await http
+      .delete("https://fast-everglades-04594.herokuapp.com/request/$requestId");
+  if (response.statusCode == 200) {
+    print("Usuwanie powiodło się.");
+  } else {
+    print(response.statusCode);
+  }
+}
+
 /// Widget pojedynczej karty, która zawiera dane o zapytaniu.
 /// Użytkownik ma możliwość sprawdzenia stanu zapytania, tytułu oraz ceny maksymalnej.
 /// Funkcja bezpośredniego linku do aukcji.
@@ -92,7 +102,7 @@ Card buildItemCard(Request request) {
           SizedBox(height: 2),
           request.auctionLinkAllegro == null
               ? Text(
-                  "Aukcji jeszcze nie odnaleziono",
+                  "Allegro - Aukcji jeszcze nie odnaleziono",
                   style: TextStyle(fontSize: 12, color: fontColor),
                 )
               : FlatButton(
@@ -105,10 +115,38 @@ Card buildItemCard(Request request) {
                     }
                   },
                   child: Text(
-                    "Naciśnij, aby przejść do aukcji",
+                    "Allegro - Naciśnij, aby przejść do aukcji",
                     style: TextStyle(fontSize: 12, color: fontColor),
                   ),
                 ),
+          request.auctionLinkEbay == null
+              ? Text(
+                  "Ebay - Aukcji jeszcze nie odnaleziono",
+                  style: TextStyle(fontSize: 12, color: fontColor),
+                )
+              : FlatButton(
+                  onPressed: () async {
+                    var url = request.auctionLinkEbay.toString();
+                    if (await canLaunch(url)) {
+                      await launch(url, forceSafariVC: false);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Text(
+                    "Ebay - Naciśnij, aby przejść do aukcji",
+                    style: TextStyle(fontSize: 12, color: fontColor),
+                  ),
+                ),
+          FlatButton(
+            onPressed: () {
+              deleteRequest(request.requestId);
+            },
+            child: Text(
+              "Usuń aukcję",
+              style: TextStyle(fontSize: 12, color: fontColor),
+            ),
+          ),
         ],
       ),
     ),
@@ -165,7 +203,7 @@ class _CurrentRequestsState extends State<CurrentRequests> {
 
   /// Funkcja, która pobiera wszystkie zapytania, które użytkownik dodał od aplikacji.
   /// Zwraca listę zapytań.
-  Future<List<Request>> fetchRequests() async {
+  Future<List<Request>> fetchRequestsActive() async {
     List<Request> requests = [];
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
@@ -179,7 +217,32 @@ class _CurrentRequestsState extends State<CurrentRequests> {
         for (var a in values)
           if (a != null) {
             Request post = Request.fromJson(a);
-            requests.add(post);
+            if (post.status == "ACTIVE") requests.add(post);
+          }
+      }
+      return requests.reversed.toList();
+    } else {
+      throw Exception('Failed to load post');
+    }
+  }
+
+  /// Funkcja, która pobiera wszystkie zapytania, które użytkownik dodał od aplikacji.
+  /// Zwraca listę zapytań.
+  Future<List<Request>> fetchRequestsClosed() async {
+    List<Request> requests = [];
+    String basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    final response = await http.get(
+        "https://fast-everglades-04594.herokuapp.com/request/user/$userid",
+        headers: {HttpHeaders.authorizationHeader: basicAuth});
+    if (response.statusCode == 200) {
+      List<dynamic> values = new List<dynamic>();
+      values = json.decode(response.body.toString());
+      if (values.length > 0) {
+        for (var a in values)
+          if (a != null) {
+            Request post = Request.fromJson(a);
+            if (post.status == "CLOSED") requests.add(post);
           }
       }
       return requests.reversed.toList();
@@ -209,119 +272,249 @@ class _CurrentRequestsState extends State<CurrentRequests> {
         ),
         body: !dataIsLoaded
             ? Center(child: CircularProgressIndicator())
-            : Stack(children: <Widget>[
-                Center(
-                  child: Column(
-                    children: <Widget>[
-                      ClipPath(
-                        clipper: CustomShapeClipper(),
-                        child: Container(
-                          color: primaryBlue,
-                          height: 250,
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            children: <Widget>[
-                              SizedBox(
-                                height: 40,
-                              ),
-                              Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    IconButton(
-                                      icon: Icon(Icons.refresh,
-                                          color: Colors.white),
-                                      onPressed: () async {
-                                        fetchRequests();
-                                      },
-                                    ),
-                                    Spacer(),
-                                    Text(
-                                      'Hunto',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                    Spacer(),
-                                    IconButton(
-                                      key: Key("LogoutUserButton"),
-                                      icon: Icon(Icons.exit_to_app,
-                                          color: Colors.white),
-                                      onPressed: () {
-                                        if (username != null) clearUser();
-                                        Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                                MaterialPageRoute(
-                                                    builder:
-                                                        (BuildContext
+            : PageView(
+                children: <Widget>[
+                  Stack(children: <Widget>[
+                    Center(
+                      child: Column(
+                        children: <Widget>[
+                          ClipPath(
+                            clipper: CustomShapeClipper(),
+                            child: Container(
+                              color: primaryBlue,
+                              height: 250,
+                              alignment: Alignment.centerLeft,
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 40,
+                                  ),
+                                  Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        IconButton(
+                                          icon: Icon(Icons.refresh,
+                                              color: Colors.white),
+                                          onPressed: () async {
+                                            fetchRequestsActive();
+                                          },
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          'Hunto',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                        Spacer(),
+                                        IconButton(
+                                          key: Key("LogoutUserButton"),
+                                          icon: Icon(Icons.exit_to_app,
+                                              color: Colors.white),
+                                          onPressed: () {
+                                            if (username != null) clearUser();
+                                            Navigator.of(context)
+                                                .pushAndRemoveUntil(
+                                                    MaterialPageRoute(
+                                                        builder: (BuildContext
                                                                 context) =>
                                                             MyHomePage()),
-                                                (Route<dynamic> route) =>
-                                                    false);
-                                      },
-                                    ),
-                                  ]),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    "Witaj,",
-                                    style: TextStyle(
-                                        fontSize: 32, color: Colors.white),
+                                                    (Route<dynamic> route) =>
+                                                        false);
+                                          },
+                                        ),
+                                      ]),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        "Witaj,",
+                                        style: TextStyle(
+                                            fontSize: 32, color: Colors.white),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(3),
+                                      ),
+                                      Text(
+                                        "$username",
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ],
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.all(3),
+                                  SizedBox(
+                                    height: 30,
                                   ),
                                   Text(
-                                    "$username",
-                                    style: TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
+                                    "Sprawdź swoje aktualne zapytania poniżej",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  SizedBox(
+                                    height: 3,
+                                  ),
+                                  Text(
+                                    "Przesuń palcem w prawo, aby zobaczyć archiwum aukcji",
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ],
                               ),
-                              SizedBox(
-                                height: 30,
-                              ),
-                              Text(
-                                "Sprawdź swoje aktualne zapytania poniżej",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                          Text('Twoje aktualne zapytania'),
+                          Expanded(
+                            child: FutureBuilder(
+                              future: fetchRequestsActive(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.data != null) {
+                                  return ListView.builder(
+                                    itemCount: snapshot.data.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      var x = snapshot.data[index];
+                                      return buildItemCard(x);
+                                    },
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Container(
+                                      child: Text(
+                                        "Naciśnij + w prawym dolnym rogu",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      Text('Twoje aktualne zapytania'),
-                      Expanded(
-                        child: FutureBuilder(
-                          future: fetchRequests(),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.data != null) {
-                              return ListView.builder(
-                                itemCount: snapshot.data.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  var x = snapshot.data[index];
-                                  return buildItemCard(x);
-                                },
-                              );
-                            } else {
-                              return Center(
-                                child: Container(
-                                  child: Text(
-                                    "Naciśnij + w prawym dolnym rogu",
-                                    style: TextStyle(fontSize: 20),
+                    ),
+                  ]),
+                  Stack(children: <Widget>[
+                    Center(
+                      child: Column(
+                        children: <Widget>[
+                          ClipPath(
+                            clipper: CustomShapeClipper(),
+                            child: Container(
+                              color: archiveColor,
+                              height: 250,
+                              alignment: Alignment.centerLeft,
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 40,
                                   ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
+                                  Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        IconButton(
+                                          icon: Icon(Icons.refresh,
+                                              color: Colors.white),
+                                          onPressed: () async {
+                                            fetchRequestsActive();
+                                          },
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          'Hunto',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                        Spacer(),
+                                        IconButton(
+                                          key: Key("LogoutUserButton"),
+                                          icon: Icon(Icons.exit_to_app,
+                                              color: Colors.white),
+                                          onPressed: () {
+                                            if (username != null) clearUser();
+                                            Navigator.of(context)
+                                                .pushAndRemoveUntil(
+                                                    MaterialPageRoute(
+                                                        builder: (BuildContext
+                                                                context) =>
+                                                            MyHomePage()),
+                                                    (Route<dynamic> route) =>
+                                                        false);
+                                          },
+                                        ),
+                                      ]),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        "Witaj,",
+                                        style: TextStyle(
+                                            fontSize: 32, color: Colors.white),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(3),
+                                      ),
+                                      Text(
+                                        "$username",
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 30,
+                                  ),
+                                  Text(
+                                    "Sprawdź swoje archiwalne zapytania poniżej",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Text('Twoje archiwalne zapytania'),
+                          Expanded(
+                            child: FutureBuilder(
+                              future: fetchRequestsClosed(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.data != null) {
+                                  return ListView.builder(
+                                    itemCount: snapshot.data.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      var x = snapshot.data[index];
+                                      return buildItemCard(x);
+                                    },
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Container(
+                                      child: Text(
+                                        "Naciśnij + w prawym dolnym rogu",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ]),
+                    ),
+                  ]),
+                ],
+              ),
       ),
     );
   }
