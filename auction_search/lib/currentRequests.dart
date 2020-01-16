@@ -31,13 +31,25 @@ Future clearUser() async {
 }
 
 Future deleteRequest(int requestId) async {
-  var response = await http
-      .delete("https://fast-everglades-04594.herokuapp.com/request/$requestId");
-  if (response.statusCode == 200) {
-    print("Usuwanie powiodło się.");
-  } else {
-    print(response.statusCode);
-  }
+  SharedPreferences user = await SharedPreferences.getInstance();
+  String username = user.getString('username');
+  String password = user.getString('password');
+  String basicAuth =
+      'Basic ' + base64Encode(utf8.encode('$username:$password'));
+  var response = await http.delete(
+      "https://fast-everglades-04594.herokuapp.com/request/$requestId",
+      headers: {HttpHeaders.authorizationHeader: basicAuth});
+}
+
+Future changeRequestStatus(int requestId, String newStatus) async {
+  SharedPreferences user = await SharedPreferences.getInstance();
+  String username = user.getString('username');
+  String password = user.getString('password');
+  String basicAuth =
+      'Basic ' + base64Encode(utf8.encode('$username:$password'));
+  var response = await http.put(
+      "https://fast-everglades-04594.herokuapp.com/request/$requestId/state/$newStatus",
+      headers: {HttpHeaders.authorizationHeader: basicAuth});
 }
 
 /// Widget pojedynczej karty, która zawiera dane o zapytaniu.
@@ -138,14 +150,40 @@ Card buildItemCard(Request request) {
                     style: TextStyle(fontSize: 12, color: fontColor),
                   ),
                 ),
-          FlatButton(
-            onPressed: () {
-              deleteRequest(request.requestId);
-            },
-            child: Text(
-              "Usuń aukcję",
-              style: TextStyle(fontSize: 12, color: fontColor),
-            ),
+          Row(
+            children: <Widget>[
+              request.status == "ACTIVE"
+                  ? FlatButton(
+                      onPressed: () {
+                        changeRequestStatus(request.requestId, "CANCELED");
+                      },
+                      child: Text(
+                        "Anuluj",
+                        style: TextStyle(fontSize: 12, color: fontColor),
+                      ),
+                    )
+                  : Text(''),
+              request.status == "CANCELED"
+                  ? FlatButton(
+                      onPressed: () {
+                        changeRequestStatus(request.requestId, "ACTIVE");
+                      },
+                      child: Text(
+                        "Wznów",
+                        style: TextStyle(fontSize: 12, color: fontColor),
+                      ),
+                    )
+                  : Text(''),
+              FlatButton(
+                onPressed: () {
+                  deleteRequest(request.requestId);
+                },
+                child: Text(
+                  "Usuń aukcję",
+                  style: TextStyle(fontSize: 12, color: fontColor),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -242,7 +280,8 @@ class _CurrentRequestsState extends State<CurrentRequests> {
         for (var a in values)
           if (a != null) {
             Request post = Request.fromJson(a);
-            if (post.status == "CLOSED") requests.add(post);
+            if (post.status == "CLOSED" || post.status == "CANCELED")
+              requests.add(post);
           }
       }
       return requests.reversed.toList();
