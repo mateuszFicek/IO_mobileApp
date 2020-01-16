@@ -65,7 +65,8 @@ class _RegisterPageState extends State<RegisterPage> {
       });
       user.setInt("userid", jsonResponse['id']);
       user.setString("username", jsonResponse['username']);
-      user.setString("email", jsonResponse['email']);
+      user.setString("password", password);
+      user.setString("date", jsonResponse['date'].toString());
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
               builder: (BuildContext context) => CurrentRequests()),

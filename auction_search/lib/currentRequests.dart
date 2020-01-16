@@ -298,8 +298,8 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                                         IconButton(
                                           icon: Icon(Icons.refresh,
                                               color: Colors.white),
-                                          onPressed: () async {
-                                            fetchRequestsActive();
+                                          onPressed: () {
+                                            setState(() {});
                                           },
                                         ),
                                         Spacer(),
@@ -421,8 +421,8 @@ class _CurrentRequestsState extends State<CurrentRequests> {
                                         IconButton(
                                           icon: Icon(Icons.refresh,
                                               color: Colors.white),
-                                          onPressed: () async {
-                                            fetchRequestsActive();
+                                          onPressed: () {
+                                            setState(() {});
                                           },
                                         ),
                                         Spacer(),
